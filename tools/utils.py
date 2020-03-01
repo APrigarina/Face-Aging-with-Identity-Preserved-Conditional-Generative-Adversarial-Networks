@@ -3,7 +3,7 @@ import math
 import json
 import random
 import pprint
-import scipy.misc
+import imageio
 import numpy as np
 from time import gmtime, strftime
 import cv2
@@ -12,10 +12,10 @@ def get_image(image_path, image_size, is_crop=True, resize_w=64, is_grayscale = 
     return transform(imread(image_path, is_grayscale), image_size, is_crop, resize_w)
 
 def save_images(images, size, image_path):
-    return imsave(inverse_transform(images), size, image_path)
+    return imageio.imwrite(inverse_transform(images), size, image_path)
 
 def save_images2(images, size, image_path):
-    return imsave(images, size, image_path)
+    return imageio.imwrite(images, size, image_path)
 
 def imread(path, is_grayscale = False):
     if (is_grayscale):
