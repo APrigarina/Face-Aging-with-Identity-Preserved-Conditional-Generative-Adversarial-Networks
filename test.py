@@ -93,19 +93,19 @@ def my_train():
 
 def generate_images_from_folder(model, sess, test_data_dir=None, train_data_dir=None):
     if test_data_dir:
-        source, paths = val_generator.load_test_imgs(test_data_dir, 128)
+        source, paths = val_generator.load_imgs(test_data_dir, 128)
     else:
         source, paths = val_generator.next_source_imgs(0, 128, batch_size=256)
 
     if train_data_dir:
-        train_imgs, _ = generator.load_test_imgs(train_data_dir, 128)
+        train_imgs, _ = generator.load_imgs(train_data_dir, 128)
     else:
         train_imgs, _ = generator.next_source_imgs(0, 128, batch_size=FLAGS.batch_size-1)
 
     assert train_imgs.shape[0] == (FLAGS.batch_size-1)
 
     for i in range(len(paths)):
-        print i
+        print (i)
         temp = np.reshape(source[i], (1, 128, 128, 3))
         save_source(temp, [1, 1], os.path.join(FLAGS.save_dir, paths[i]))
         images = np.concatenate((temp, train_imgs), axis=0)
@@ -136,13 +136,13 @@ def generate_images(model, sess):
         save_images(samples, [1, 1], os.path.join(FLAGS.save_dir, paths[0] + '_' + str(j) + '.jpg'))
 
     time2 = time.time() - time1
-    print time2
+    print (time2)
 
 
 
 def stable_bn(model, sess, num_iter):
     for iter in range(num_iter):
-        print iter
+        print (iter)
         train_imgs, _ = generator.next_source_imgs(0, 128, batch_size=FLAGS.batch_size)
         for j in range(1, generator.n_classes):
             true_label_fea = generator.label_features_128[j]

@@ -51,7 +51,7 @@ class ImageDataGenerator:
         self.z_dim = z_dim
         self.img_size = self.height
 
-        self.read_class_list(self.class_lists)
+        # self.read_class_list(self.class_lists)
         if self.shuffle:
             self.shuffle_data(shuffle_all=True)
 
@@ -405,7 +405,7 @@ class ImageDataGenerator:
 
         return imgs, self.one_hot_labels[index], self.label_features_64[index], \
                self.label_features_64[error_label], self.age_label[index]
-    
+
     def next_target_batch_transfer2(self):
         index = self.true_labels[self.label_pair_index]
         paths = self.images[index][self.pointer[index]:self.pointer[index] + self.batch_size]
