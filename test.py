@@ -105,10 +105,12 @@ def generate_images_from_folder(model, sess, test_data_dir=None, train_data_dir=
     assert train_imgs.shape[0] == (FLAGS.batch_size-1)
 
     for i in range(len(paths)):
-        print (i)
+        print ("generate images from folder", i)
+        print (paths[i])
         temp = np.reshape(source[i], (1, 128, 128, 3))
         save_source(temp, [1, 1], os.path.join(FLAGS.save_dir, paths[i]))
         images = np.concatenate((temp, train_imgs), axis=0)
+        time1 = time.time()
         for j in range(1, generator.n_classes):
             true_label_fea = generator.label_features_128[j]
             dict = {
@@ -120,6 +122,8 @@ def generate_images_from_folder(model, sess, test_data_dir=None, train_data_dir=
             # generator.save_batch(samples, paths, FLAGS.save_dir, index=j, if_target=True)
             save_images(image, [1, 1], os.path.join(FLAGS.save_dir, paths[i] + '_' + str(j) + '.jpg'))
 
+        time2 = time.time() - time1
+        print ("time", time2)
 
 
 def generate_images(model, sess):
@@ -136,7 +140,7 @@ def generate_images(model, sess):
         save_images(samples, [1, 1], os.path.join(FLAGS.save_dir, paths[0] + '_' + str(j) + '.jpg'))
 
     time2 = time.time() - time1
-    print (time2)
+    print ("time", time2)
 
 
 
