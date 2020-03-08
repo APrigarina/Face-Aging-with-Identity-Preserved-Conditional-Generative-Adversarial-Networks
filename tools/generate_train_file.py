@@ -1,6 +1,6 @@
 import os
 
-path="/content/drive/My Drive/Diploma/datasets/CACD2000/"
+path="/content/drive/My Drive/Diploma/dataset/CACD2000/"
 agegrp_1=0
 agegrp_2=0
 agegrp_3=0
