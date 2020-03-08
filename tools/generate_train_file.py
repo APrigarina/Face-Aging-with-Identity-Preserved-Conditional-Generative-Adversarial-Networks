@@ -68,43 +68,56 @@ with open(path + '../train.txt',"a+") as f:
         f.write("%s %d\n"%(fname, 3))
     for fname in train_age_4:
         f.write("%s %d\n"%(fname, 4))
-# with open('./age_data/train_data/train_age_group_0.txt',"a+") as f:
-# for fname in train_age_0:
-# f.write("%s\n"%fname)
-#
-# with open('./age_data/train_data/train_age_group_1.txt', "a+") as f:
-# for fname in train_age_1:
-# f.write("%s\n" %fname)
-#
-# with open('./age_data/train_data/train_age_group_2.txt', "a+") as f:
-# for fname in train_age_2:
-# f.write("%s\n" %fname)
-#
-# with open('./age_data/train_data/train_age_group_3.txt', "a+") as f:
-# for fname in train_age_3:
-# f.write("%s\n" %fname )
-#
-# with open('./age_data/train_data/train_age_group_4.txt', "a+") as f:
-# for fname in train_age_4:
-# f.write("%s\n" %fname )
-#
-# with open('./age_data/test_data/test_age_group_0.txt', "a+") as f:
-# for fname in test_age_0:
-# f.write("%s\n" % fname)
-#
-# with open('./age_data/test_data/test_age_group_1.txt', "a+") as f:
-# for fname in test_age_1:
-# f.write("%s\n" % fname)
-#
-# with open('./age_data/test_data/test_age_group_2.txt', "a+") as f:
-# for fname in test_age_2:
-# f.write("%s\n" % fname)
-#
-# with open('./age_data/test_data/test_age_group_3.txt', "a+") as f:
-# for fname in test_age_3:
-# f.write("%s\n" % fname)
-#
-# with open('./age_data/test_data/test_age_group_4.txt', "a+") as f:
-# for fname in test_age_4:
-# f.write("%s\n" % fname)
+
+with open(path + '../test.txt',"a+") as f:
+    for fname in test_age_0:
+        f.write("%s %d\n"%(fname, 0))
+    for fname in test_age_1:
+        f.write("%s %d\n"%(fname, 1))
+    for fname in test_age_2:
+        f.write("%s %d\n"%(fname, 2))
+    for fname in test_age_3:
+        f.write("%s %d\n"%(fname, 3))
+    for fname in test_age_4:
+        f.write("%s %d\n"%(fname, 4))
+
+with open('./age_data/train_data/train_age_group_0.txt',"a+") as f:
+    for fname in train_age_0:
+        f.write("%s\n"%fname)
+
+with open('./age_data/train_data/train_age_group_1.txt', "a+") as f:
+    for fname in train_age_1:
+        f.write("%s\n" %fname)
+
+with open('./age_data/train_data/train_age_group_2.txt', "a+") as f:
+    for fname in train_age_2:
+        f.write("%s\n" %fname)
+
+with open('./age_data/train_data/train_age_group_3.txt', "a+") as f:
+    for fname in train_age_3:
+        f.write("%s\n" %fname )
+
+with open('./age_data/train_data/train_age_group_4.txt', "a+") as f:
+    for fname in train_age_4:
+        f.write("%s\n" %fname )
+
+with open('./age_data/test_data/test_age_group_0.txt', "a+") as f:
+    for fname in test_age_0:
+        f.write("%s\n" % fname)
+
+with open('./age_data/test_data/test_age_group_1.txt', "a+") as f:
+    for fname in test_age_1:
+        f.write("%s\n" % fname)
+
+with open('./age_data/test_data/test_age_group_2.txt', "a+") as f:
+    for fname in test_age_2:
+        f.write("%s\n" % fname)
+
+with open('./age_data/test_data/test_age_group_3.txt', "a+") as f:
+    for fname in test_age_3:
+        f.write("%s\n" % fname)
+
+with open('./age_data/test_data/test_age_group_4.txt', "a+") as f:
+    for fname in test_age_4:
+        f.write("%s\n" % fname)
 #

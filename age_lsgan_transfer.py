@@ -53,7 +53,7 @@ flags.DEFINE_string("fea_layer_name", None, "which layer to use for fea_loss")
 
 flags.DEFINE_string("source_file", '/content/drive/My Drive/Diploma/dataset/train.txt', "source file path")
 
-flags.DEFINE_string("root_folder", 'CACD_cropped_400/', "folder that contains images")
+flags.DEFINE_string("root_folder", '/content/drive/My Drive/Diploma/dataset/CACD2000/', "folder that contains images")
 
 FLAGS = flags.FLAGS
 
