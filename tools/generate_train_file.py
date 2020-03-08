@@ -18,6 +18,7 @@ test_age_3=[]
 test_age_4=[]
 
 for fname in os.listdir(path):
+    print(fname)
     age = int(fname.split("_")[0])
     if (age >= 11 and age <= 20):
         agegrp_1 += 1
