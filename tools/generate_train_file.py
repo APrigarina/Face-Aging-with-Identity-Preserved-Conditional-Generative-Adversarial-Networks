@@ -19,9 +19,9 @@ test_age_4=[]
 
 for fname in os.listdir(path):
     age = int(fname.split("_")[0])
-    if(age>=11 and age<=20):
+    if (age >= 11 and age <= 20):
         agegrp_1 += 1
-        if(agegrp_1 % 10 == 0):
+        if (agegrp_1 % 10 == 0):
             test_age_0.append(fname)
         else:
             train_age_0.append(fname)
@@ -32,20 +32,20 @@ for fname in os.listdir(path):
         else:
             train_age_1.append(fname)
     if (age >= 31 and age <= 40):
-        agegrp_3 = agegrp_3 + 1
+        agegrp_3 += 1
         if (agegrp_3 % 10 == 0):
            test_age_2.append(fname)
         else:
            train_age_2.append(fname)
     if (age >= 41 and age <= 50):
-        agegrp_4 = agegrp_4 + 1
-        if (agegrp_4 % 10 == 0:
+        agegrp_4 += 1
+        if (agegrp_4 % 10 == 0):
             test_age_3.append(fname)
         else:
             train_age_3.append(fname)
     if (age >= 51):
-        agegrp_5 = agegrp_5 + 1
-        if (agegrp_5 % 10 == 0:
+        agegrp_5 += 1
+        if (agegrp_5 % 10 == 0):
             test_age_4.append(fname)
         else:
             train_age_4.append(fname)
