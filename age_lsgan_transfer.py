@@ -27,10 +27,10 @@ flags.DEFINE_integer("age_groups", 5, "the number of different age groups")
 
 flags.DEFINE_integer('max_steps', 200000, 'Number of batches to run')
 
-flags.DEFINE_string("alexnet_pretrained_model", "pre_trained/alexnet.model-292000",
+flags.DEFINE_string("alexnet_pretrained_model", "/content/drive/My Drive/Diploma/alexnet/alexnet.model-292000",
                     "Directory name to save the checkpoints")
 
-flags.DEFINE_string("age_pretrained_model", "pre_trained/age_classifier.model-300000",
+flags.DEFINE_string("age_pretrained_model", "/content/drive/My Drive/Diploma/age_classifier/age_classifier.model-300000",
                     "Directory name to save the checkpoints")
 
 flags.DEFINE_integer('model_index', None, 'the index of trained model')
