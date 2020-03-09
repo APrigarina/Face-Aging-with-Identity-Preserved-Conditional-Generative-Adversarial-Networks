@@ -86,11 +86,11 @@ def my_train():
         age_label = tf.placeholder(tf.int32, [FLAGS.batch_size])
 
         print('Shapes')
-        print('imgs', tf.shape(imgs))
-        print('true_label_features_128', tf.shape(true_label_features_128))
-        print('true_label_features_64', tf.shape(true_label_features_64))
-        print('false_label_features_64', tf.shape(false_label_features_64))
-        print('age_label', tf.shape(age_label))
+        print('imgs', tf.shape(imgs).numpy())
+        print('true_label_features_128', tf.shape(true_label_features_128).numpy())
+        print('true_label_features_64', tf.shape(true_label_features_64).numpy())
+        print('false_label_features_64', tf.shape(false_label_features_64).numpy())
+        print('age_label', tf.shape(age_label).numpy())
 
         source_img_227, source_img_128, face_label = load_source_batch3(FLAGS.source_file, FLAGS.root_folder, FLAGS.batch_size)
         print("after load source batch3")
