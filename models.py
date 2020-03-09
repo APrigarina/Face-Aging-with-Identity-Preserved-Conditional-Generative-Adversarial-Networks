@@ -182,7 +182,8 @@ class FaceAging(object):
         :param false_label_fea: the same size as imgs, has 5 channels
         :return:
         """
-
+        print("imgs", len(imgs), imgs)
+        print
         self.face_age_alexnet(source_img_227, if_age=True)
         if fea_layer_name == 'conv3':
             source_fea = self.conv3
@@ -197,7 +198,10 @@ class FaceAging(object):
         elif fea_layer_name == 'fc7':
             source_fea = self.fc7
 
+        print("Okay 1")
+
         self.g_source = self.ResnetGenerator(source_img_128, name='generator', condition=true_label_fea_128)
+        print("Okay 2")
 
         discriminator = self.PatchDiscriminator
 
@@ -207,6 +211,7 @@ class FaceAging(object):
         D2_logits = discriminator(imgs, name='discriminator', condition=false_label_fea_64, reuse=True)
         # fake image, true label
         D3_logits = discriminator(self.g_source, name='discriminator', condition=true_label_fea_64, reuse=True)
+        print("Okay 3")
 
         d_loss_real = tf.reduce_mean(tf.square(D1_logits - 1.))
         d_loss_fake1 = tf.reduce_mean(tf.square(D2_logits))
@@ -221,11 +226,14 @@ class FaceAging(object):
 
         g_source = tf.image.resize_bilinear(images=g_source, size=[227, 227])
         g_source = g_source - self.mean
+        print("Okay 4")
 
         self.face_age_alexnet(g_source, if_age=True, reuse=True)
+        print("Okay 5")
         self.age_loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
                                                 logits=self.age_logits, labels=age_label)) * self.age_loss_weight
 
+        print("Okay 6")
         if fea_layer_name == 'conv3':
             ge_fea = self.conv3
         elif fea_layer_name == 'conv4':
@@ -242,17 +250,21 @@ class FaceAging(object):
         self.fea_loss = self.fea_loss_weight * mse(ge_fea, source_fea)
 
         g_loss = self.g_loss + self.fea_loss + self.age_loss
+        print("Okay 7")
 
         self.get_vars()
+        print("Okay 8")
 
         d_optim = tf.train.AdamOptimizer(self.learning_rate, beta1=0.5).minimize(self.d_loss,
                                                                                  var_list=self.d_vars)
         train_ops = [d_optim] + self._extra_train_ops
         self.d_optim = tf.group(*train_ops)
+        print("Okay 9")
 
         g_optim = tf.train.AdamOptimizer(self.learning_rate, beta1=0.5).minimize(g_loss, var_list=self.g_vars)
         train_ops = [g_optim] + self._extra_train_ops
         self.g_optim = tf.group(*train_ops)
+        print("Okay 10")
 
 
     def generate_images(self, source_img_128, true_label_fea, stable_bn=False, reuse=False, mode='test'):
