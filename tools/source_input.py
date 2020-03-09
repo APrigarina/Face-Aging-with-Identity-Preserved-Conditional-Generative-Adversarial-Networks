@@ -50,6 +50,7 @@ def read_images2(filename_queue):
 
     reader = tf.WholeFileReader()
     key, value = reader.read(filename_queue)
+    print("read_images2", key, value)
     image = tf.image.decode_jpeg(value)  # use png or jpeg decoder based on your files
     image = tf.reshape(image, [IM_HEIGHT, IM_WIDTH, IM_CHANNELS])
 
@@ -160,6 +161,7 @@ def get_imgAndlabel_list(filename, img_folder):
     for i in range(len(lines)):
         img_name = lines[i].split()[0]
         imgname_lists.append(os.path.join(img_folder, img_name))
+        print(os.path.join(img_folder, img_name))
     return imgname_lists
 
 def get_imgAndlabel_list2(filename, img_folder):

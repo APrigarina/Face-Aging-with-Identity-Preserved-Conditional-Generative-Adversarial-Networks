@@ -86,7 +86,7 @@ def my_train():
         age_label = tf.placeholder(tf.int32, [FLAGS.batch_size])
 
         source_img_227, source_img_128, face_label = load_source_batch3(FLAGS.source_file, FLAGS.root_folder, FLAGS.batch_size)
-
+        print("after load source batch3")
         model.train_age_lsgan_transfer(source_img_227, source_img_128, imgs, true_label_features_128,
                                        true_label_features_64, false_label_features_64, FLAGS.fea_layer_name, age_label)
 
