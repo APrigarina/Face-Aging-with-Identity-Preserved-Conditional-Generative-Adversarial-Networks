@@ -131,12 +131,16 @@ def load_source_batch3(filename, img_folder, batch_size, shuffle=True):
     img_list, label_list = get_imgAndlabel_list2(filename, img_folder)
     print('%d images to train' % (len(img_list)))
 
+    print("img_list", img_list)
+    print("label_list", label_list)
     images = ops.convert_to_tensor(img_list, dtype=tf.string)
     labels = ops.convert_to_tensor(label_list, dtype=tf.int32)
+    print("converted to tensor images", images)
+    print("converted to tensor labels", labels)
 
     # Makes an input queue
     input_queue = tf.train.slice_input_producer([images, labels], shuffle=shuffle)
-
+    print("queue", input_queue)
     # Even when reading in multiple threads, share the filename queue.
     image_227, image_128, label = read_images3(input_queue)
     image_227_batch, image_128_batch, label_batch = tf.train.shuffle_batch(
