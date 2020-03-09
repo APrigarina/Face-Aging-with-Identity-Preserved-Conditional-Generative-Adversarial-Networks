@@ -32,6 +32,7 @@ class FaceAging(object):
 
     def inference(self, x, scope_name='alexnet', reuse=False):
         with tf.variable_scope(scope_name, reuse=reuse) as scope:
+            print("inference", x)
             # 1st Layer: Conv (w ReLu) -> Pool -> Lrn
             conv1 = conv(x, 11, 11, 96, 4, 4, padding='VALID', name='conv1')
             pool1 = max_pool(conv1, 3, 3, 2, 2, padding='VALID', name='pool1')
@@ -67,6 +68,7 @@ class FaceAging(object):
 
     def face_age_alexnet(self, x, scope_name='alexnet', if_age=False, reuse=False):
         with tf.variable_scope(scope_name, reuse=reuse) as scope:
+            print("face_age_alexnet", x)
             # 1st Layer: Conv (w ReLu) -> Pool -> Lrn
             conv1 = conv(x, 11, 11, 96, 4, 4, padding='VALID', name='conv1')
             pool1 = max_pool(conv1, 3, 3, 2, 2, padding='VALID', name='pool1')
@@ -119,6 +121,7 @@ class FaceAging(object):
 
     def ResnetGenerator(self, image, name, n_blocks=6, condition=None, mode='train', reuse=False):
         with tf.variable_scope(name):
+            print("ResnetGenerator", image)
             if reuse:
                 tf.get_variable_scope().reuse_variables()
 
@@ -152,6 +155,7 @@ class FaceAging(object):
 
     def PatchDiscriminator(self, image, name, condition=None, mode='train', reuse=False):
         with tf.variable_scope(name):
+            print("PatchDiscriminator", image)
             if reuse:
                 tf.get_variable_scope().reuse_variables()
 
