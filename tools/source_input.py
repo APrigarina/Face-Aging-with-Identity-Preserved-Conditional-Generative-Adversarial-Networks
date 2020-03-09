@@ -131,8 +131,8 @@ def load_source_batch3(filename, img_folder, batch_size, shuffle=True):
     img_list, label_list = get_imgAndlabel_list2(filename, img_folder)
     print('%d images to train' % (len(img_list)))
 
-    print("img_list", img_list)
-    print("label_list", label_list)
+    print("img_list", len(img_list), img_list[0])
+    print("label_list", len(label_list), label_list[0])
     images = ops.convert_to_tensor(img_list, dtype=tf.string)
     labels = ops.convert_to_tensor(label_list, dtype=tf.int32)
     print("converted to tensor images", images)
