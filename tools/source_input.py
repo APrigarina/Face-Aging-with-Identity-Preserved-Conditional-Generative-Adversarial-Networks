@@ -65,7 +65,9 @@ def read_images2(filename_queue):
 def read_images3(input_queue):
 
     label = input_queue[1]
+    print("read images 3 label", label)
     file_contents = tf.read_file(input_queue[0])
+    print("read images 3 file", file_contents)
     image = tf.image.decode_image(file_contents, channels=3)
     image = tf.reshape(image, [IM_HEIGHT, IM_WIDTH, IM_CHANNELS])
 
@@ -161,7 +163,6 @@ def get_imgAndlabel_list(filename, img_folder):
     for i in range(len(lines)):
         img_name = lines[i].split()[0]
         imgname_lists.append(os.path.join(img_folder, img_name))
-        print(os.path.join(img_folder, img_name))
     return imgname_lists
 
 def get_imgAndlabel_list2(filename, img_folder):
@@ -177,9 +178,11 @@ def get_imgAndlabel_list2(filename, img_folder):
     f.close()
     imgname_lists = []
     label_lists = []
+    # print("get_imgAndlabel_list")
     for i in range(len(lines)):
         img_name, label = lines[i].split()
         imgname_lists.append(os.path.join(img_folder, img_name))
+        # print(os.path.join(img_folder, img_name))
         label_lists.append(int(label))
 
     return imgname_lists, label_lists
