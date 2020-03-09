@@ -182,8 +182,7 @@ class FaceAging(object):
         :param false_label_fea: the same size as imgs, has 5 channels
         :return:
         """
-        print("imgs", len(imgs), imgs)
-        print
+        print("imgs", imgs)
         self.face_age_alexnet(source_img_227, if_age=True)
         if fea_layer_name == 'conv3':
             source_fea = self.conv3
