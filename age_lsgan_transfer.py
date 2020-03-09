@@ -93,9 +93,13 @@ def my_train():
         ge_samples = model.generate_images(imgs, true_label_features_128, reuse=True, mode='train')
 
         # Create a saver.
+        print("Creating savers")
         model.saver = tf.train.Saver(model.save_d_vars + model.save_g_vars, max_to_keep=200)
+        print("Model saver", model.save_d_vars + model.save_g_vars)
         model.alexnet_saver = tf.train.Saver(model.alexnet_vars)
+        print("Model alexnet", model.alexnet_vars)
         model.age_saver = tf.train.Saver(model.age_vars)
+        print("Model age", model.age_vars)
 
         d_error = model.d_loss/model.gan_loss_weight
         g_error = model.g_loss/model.gan_loss_weight
@@ -105,6 +109,8 @@ def my_train():
         # Start running operations on the Graph.
         sess.run(tf.global_variables_initializer())
         tf.train.start_queue_runners(sess)
+
+        print("age)lsgan before restore ",FLAGS.checkpoint_dir, model.saver )
 
         model.alexnet_saver.restore(sess, FLAGS.alexnet_pretrained_model)
         model.age_saver.restore(sess, FLAGS.age_pretrained_model)
