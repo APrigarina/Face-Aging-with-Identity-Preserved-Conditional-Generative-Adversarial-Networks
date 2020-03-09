@@ -32,7 +32,7 @@ class ImageDataGenerator:
                                'test_age_group_4.txt']
             self.pointer = [0, 0, 0, 0, 0, 0]
 
-        self.train_label_pair = '/content/drive/My Drive/Diploma/dataset/train.txt'
+        self.train_label_pair = 'train_label_pair.txt'
         self.true_labels = []
         self.false_labels = []
         self.images = []
