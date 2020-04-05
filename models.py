@@ -387,6 +387,7 @@ class FaceAging(object):
         print(" [*] Reading checkpoints...")
         print(checkpoint_dir)
         ckpt = tf.train.get_checkpoint_state(checkpoint_dir)
+        print("ckpt", ckpt)
         if model_num and prefix:
             ckpt_name = prefix + '.model-' + str(model_num)
             saver.restore(self.sess, os.path.join(checkpoint_dir, ckpt_name))

@@ -115,6 +115,7 @@ def my_train():
 
         # Start running operations on the Graph.
         sess.run(tf.global_variables_initializer())
+        print("start_queue_runners")
         tf.train.start_queue_runners(sess)
 
         print("age)lsgan before restore ",FLAGS.checkpoint_dir, model.saver )
