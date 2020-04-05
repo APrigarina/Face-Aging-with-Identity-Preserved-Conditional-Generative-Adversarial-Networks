@@ -115,14 +115,17 @@ def my_train():
 
         # Start running operations on the Graph.
         sess.run(tf.global_variables_initializer())
-        print("start_queue_runners")
+        print("before start_queue_runners")
         tf.train.start_queue_runners(sess)
+        print("after start_queue_runners")
 
-        print("age)lsgan before restore ",FLAGS.checkpoint_dir, model.saver )
-
+        # print("age_lsgan before restore ",FLAGS.checkpoint_dir, model.saver )
+        
+        print("alexnet_saver before restore ",FLAGS.alexnet_pretrained_model )
         model.alexnet_saver.restore(sess, FLAGS.alexnet_pretrained_model)
+        print("age_saver before restore ",FLAGS.alexnet_pretrained_model )
         model.age_saver.restore(sess, FLAGS.age_pretrained_model)
-
+        print("==========load===========")
         if model.load(FLAGS.checkpoint_dir, model.saver):
             print(" [*] Load SUCCESS")
         else:
