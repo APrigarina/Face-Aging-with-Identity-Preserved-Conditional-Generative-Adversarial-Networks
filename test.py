@@ -15,7 +15,7 @@ from pycallgraph.output import GraphvizOutput
 flags = tf.app.flags
 flags.DEFINE_float("learning_rate", 0.001, "Learning rate")
 
-flags.DEFINE_integer("batch_size", 32, "The size of batch images")
+flags.DEFINE_integer("batch_size", 1, "The size of batch images")
 
 flags.DEFINE_integer("image_size", 128, "the size of the generated image")
 
@@ -103,7 +103,7 @@ def generate_images_from_folder(model, sess, test_data_dir=None, train_data_dir=
     else:
         train_imgs, _ = generator.next_source_imgs(0, 128, batch_size=FLAGS.batch_size-1)
 
-    assert train_imgs.shape[0] == (FLAGS.batch_size-1)
+    # assert train_imgs.shape[0] == (FLAGS.batch_size)
 
     for i in range(len(paths)):
         print ("generate images from folder", i)
@@ -167,6 +167,7 @@ def main(argv=None):
 
 if __name__ == '__main__':
     gr = GraphvizOutput()
-    gr.output_file = 'result.png'
+    gr.output_file = 'result.svg'
+    gr.output_type = 'svg'
     with PyCallGraph(output=gr):
         tf.app.run()
