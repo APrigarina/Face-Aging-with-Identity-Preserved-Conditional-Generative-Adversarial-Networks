@@ -10,8 +10,7 @@ import sys
 sys.path.append('./tools/')
 from utils import save_images, save_source
 from data_generator import ImageDataGenerator
-from pycallgraph import PyCallGraph
-from pycallgraph.output import GraphvizOutput
+
 flags = tf.app.flags
 flags.DEFINE_float("learning_rate", 0.001, "Learning rate")
 
@@ -103,7 +102,7 @@ def generate_images_from_folder(model, sess, test_data_dir=None, train_data_dir=
     else:
         train_imgs, _ = generator.next_source_imgs(0, 128, batch_size=FLAGS.batch_size-1)
 
-    # assert train_imgs.shape[0] == (FLAGS.batch_size)
+    assert train_imgs.shape[0] == (FLAGS.batch_size-1)
 
     for i in range(len(paths)):
         print ("generate images from folder", i)
@@ -162,16 +161,8 @@ def stable_bn(model, sess, num_iter):
 
 
 def main(argv=None):
-    gr = GraphvizOutput()
-    gr.output_file = 'result.svg'
-    gr.output_type = 'svg'
-    with PyCallGraph(output=gr):
-        my_train()
+    my_train()
 
 
 if __name__ == '__main__':
-    gr = GraphvizOutput()
-    gr.output_file = 'result.svg'
-    gr.output_type = 'svg'
-    with PyCallGraph(output=gr):
-        tf.app.run()
+    tf.app.run()
