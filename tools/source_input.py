@@ -69,7 +69,9 @@ def read_images3(input_queue):
     file_contents = tf.read_file(input_queue[0])
     print("read images 3 file", file_contents)
     image = tf.image.decode_image(file_contents, channels=3)
+    print("CHECK RESHAPE BEFORE", image.shape)
     image = tf.reshape(image, [IM_HEIGHT, IM_WIDTH, IM_CHANNELS])
+    print("CHECK RESHAPE AFTER", image.shape)
 
     image_227 = tf.image.resize_images(image, [227, 227])
     image_227 = tf.cast(image_227, tf.float32) - np.array([104., 117., 124.])

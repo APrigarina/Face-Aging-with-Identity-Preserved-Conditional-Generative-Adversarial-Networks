@@ -127,15 +127,15 @@ def my_train():
 
         # print("age_lsgan before restore ",FLAGS.checkpoint_dir, model.saver )
         
-        # print("alexnet_saver before restore ",FLAGS.alexnet_pretrained_model )
-        # model.alexnet_saver.restore(sess, FLAGS.alexnet_pretrained_model)
-        # print("age_saver before restore ",FLAGS.age_pretrained_model )
-        # model.age_saver.restore(sess, FLAGS.age_pretrained_model)
-        # print("==========load===========")
-        # if model.load(FLAGS.checkpoint_dir, model.saver):
-        #     print(" [*] Load SUCCESS")
-        # else:
-        #     print(" [!] Load failed...")
+        print("alexnet_saver before restore ",FLAGS.alexnet_pretrained_model )
+        model.alexnet_saver.restore(sess, FLAGS.alexnet_pretrained_model)
+        print("age_saver before restore ",FLAGS.age_pretrained_model )
+        model.age_saver.restore(sess, FLAGS.age_pretrained_model)
+        print("==========load===========")
+        if model.load(FLAGS.checkpoint_dir, model.saver):
+            print(" [*] Load SUCCESS")
+        else:
+            print(" [!] Load failed...")
 
         print("{} Start training...")
 
