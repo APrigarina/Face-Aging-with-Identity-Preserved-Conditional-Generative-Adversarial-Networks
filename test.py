@@ -15,7 +15,7 @@ from pycallgraph.output import GraphvizOutput
 flags = tf.app.flags
 flags.DEFINE_float("learning_rate", 0.001, "Learning rate")
 
-flags.DEFINE_integer("batch_size", 1, "The size of batch images")
+flags.DEFINE_integer("batch_size", 2, "The size of batch images")
 
 flags.DEFINE_integer("image_size", 128, "the size of the generated image")
 
