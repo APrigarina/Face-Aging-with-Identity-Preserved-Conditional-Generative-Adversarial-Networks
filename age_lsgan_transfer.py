@@ -127,15 +127,15 @@ def my_train():
 
         # print("age_lsgan before restore ",FLAGS.checkpoint_dir, model.saver )
         
-        print("alexnet_saver before restore ",FLAGS.alexnet_pretrained_model )
-        model.alexnet_saver.restore(sess, FLAGS.alexnet_pretrained_model)
-        print("age_saver before restore ",FLAGS.age_pretrained_model )
-        model.age_saver.restore(sess, FLAGS.age_pretrained_model)
-        print("==========load===========")
-        if model.load(FLAGS.checkpoint_dir, model.saver):
-            print(" [*] Load SUCCESS")
-        else:
-            print(" [!] Load failed...")
+        # print("alexnet_saver before restore ",FLAGS.alexnet_pretrained_model )
+        # model.alexnet_saver.restore(sess, FLAGS.alexnet_pretrained_model)
+        # print("age_saver before restore ",FLAGS.age_pretrained_model )
+        # model.age_saver.restore(sess, FLAGS.age_pretrained_model)
+        # print("==========load===========")
+        # if model.load(FLAGS.checkpoint_dir, model.saver):
+        #     print(" [*] Load SUCCESS")
+        # else:
+        #     print(" [!] Load failed...")
 
         print("{} Start training...")
 
@@ -143,6 +143,7 @@ def my_train():
         for step in range(FLAGS.max_steps):
             images, t_label_features_128, t_label_features_64, f_label_features_64, age_labels = \
                 train_generator.next_target_batch_transfer2()
+            print("images shape", images.shape)
             dict = {imgs: images,
                     true_label_features_128: t_label_features_128,
                     true_label_features_64: t_label_features_64,
@@ -187,7 +188,4 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-    gr = GraphvizOutput()
-    gr.output_file = 'result.png'
-    with PyCallGraph(output=gr):
         tf.app.run()
