@@ -10,7 +10,8 @@ import sys
 sys.path.append('./tools/')
 from utils import save_images, save_source
 from data_generator import ImageDataGenerator
-
+from pycallgraph import PyCallGraph
+from pycallgraph.output import GraphvizOutput
 flags = tf.app.flags
 flags.DEFINE_float("learning_rate", 0.001, "Learning rate")
 
@@ -165,4 +166,7 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-    tf.app.run()
+    gr = GraphvizOutput()
+    gr.output_file = 'result.png'
+    with PyCallGraph(output=gr):
+        tf.app.run()
