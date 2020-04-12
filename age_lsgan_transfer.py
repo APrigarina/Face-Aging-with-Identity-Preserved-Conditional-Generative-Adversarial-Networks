@@ -12,6 +12,12 @@ from source_input import load_source_batch3
 from utils import save_images, save_source
 from data_generator import ImageDataGenerator
 
+from pycallgraph import PyCallGraph
+from pycallgraph.output import GraphvizOutput
+
+
+    
+
 flags = tf.app.flags
 flags.DEFINE_float("learning_rate", 0.001, "Learning rate")
 
@@ -123,7 +129,7 @@ def my_train():
         
         print("alexnet_saver before restore ",FLAGS.alexnet_pretrained_model )
         model.alexnet_saver.restore(sess, FLAGS.alexnet_pretrained_model)
-        print("age_saver before restore ",FLAGS.alexnet_pretrained_model )
+        print("age_saver before restore ",FLAGS.age_pretrained_model )
         model.age_saver.restore(sess, FLAGS.age_pretrained_model)
         print("==========load===========")
         if model.load(FLAGS.checkpoint_dir, model.saver):
@@ -181,4 +187,7 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-    tf.app.run()
+    gr = GraphvizOutput()
+    gr.output_file = 'result.png'
+    with PyCallGraph(output=gr):
+        tf.app.run()
