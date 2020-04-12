@@ -162,7 +162,11 @@ def stable_bn(model, sess, num_iter):
 
 
 def main(argv=None):
-    my_train()
+    gr = GraphvizOutput()
+    gr.output_file = 'result.svg'
+    gr.output_type = 'svg'
+    with PyCallGraph(output=gr):
+        my_train()
 
 
 if __name__ == '__main__':
