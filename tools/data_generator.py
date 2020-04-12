@@ -309,7 +309,7 @@ class ImageDataGenerator:
 
     def load_imgs(self, data_dir, img_size=128):
         paths = os.listdir(data_dir)
-        paths = [paths[0]]
+        paths = [paths[0], paths[1]]
         # Read images
         imgs = np.ndarray([len(paths), img_size, img_size, 3])
         for i in range(len(paths)):
