@@ -148,7 +148,7 @@ class FaceAging(object):
         return bn
 
 
-    def face_age_mobilenet(self, x, scope_name='mobilenet', if_age=False, reuse=False, is_training=False):
+    def face_age_mobilenet(self, x, scope_name='mobilenet', width_multiplier=1, if_age=False, reuse=False, is_training=False):
         with tf.variable_scope(scope_name, reuse=reuse) as sc:
             end_points_collection = sc.name + '_end_points'
             with slim.arg_scope([slim.convolution2d, slim.separable_convolution2d],
