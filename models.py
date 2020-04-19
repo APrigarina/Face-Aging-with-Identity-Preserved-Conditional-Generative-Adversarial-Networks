@@ -160,32 +160,32 @@ class FaceAging(object):
                                     fused=True):
                     net = slim.convolution2d(x, round(32 * width_multiplier), [3, 3], stride=2, padding='SAME', scope='conv_1')
                     net = slim.batch_norm(net, scope='conv_1/batch_norm')
-                    net = self._depthwise_separable_conv(net, 64, width_multiplier=width_multiplier, sc='conv_ds_2')
-                    net = self._depthwise_separable_conv(net, 128, width_multiplier=width_multiplier, downsample=True, sc='conv_ds_3')
+                    net = self._depthwise_separable_conv(net, 64, 'conv_ds_2', width_multiplier=width_multiplier)
+                    net = self._depthwise_separable_conv(net, 128, 'conv_ds_3', width_multiplier=width_multiplier, downsample=True)
                     self.conv_ds_3 = net
-                    net = self._depthwise_separable_conv(net, 128, width_multiplier=width_multiplier, sc='conv_ds_4')
+                    net = self._depthwise_separable_conv(net, 128, 'conv_ds_4', width_multiplier=width_multiplier)
                     self.conv_ds_4 = net
-                    net = self._depthwise_separable_conv(net, 256, width_multiplier=width_multiplier, downsample=True, sc='conv_ds_5')
+                    net = self._depthwise_separable_conv(net, 256, 'conv_ds_5', width_multiplier=width_multiplier, downsample=True)
                     self.conv_ds_5 = net
-                    net = self._depthwise_separable_conv(net, 256, width_multiplier=width_multiplier, sc='conv_ds_6')
+                    net = self._depthwise_separable_conv(net, 256, 'conv_ds_6', width_multiplier=width_multiplier)
                     self.conv_ds_6 = net
-                    net = self._depthwise_separable_conv(net, 512, width_multiplier=width_multiplier, downsample=True, sc='conv_ds_7')
+                    net = self._depthwise_separable_conv(net, 512, 'conv_ds_7', width_multiplier=width_multiplier, downsample=True)
                     self.conv_ds_7 = net
 
-                    net = self._depthwise_separable_conv(net, 512, width_multiplier, sc='conv_ds_8')
+                    net = self._depthwise_separable_conv(net, 512, 'conv_ds_8', width_multiplier=width_multiplier)
                     self.conv_ds_8 = net
-                    net = self._depthwise_separable_conv(net, 512, width_multiplier, sc='conv_ds_9')
+                    net = self._depthwise_separable_conv(net, 512, 'conv_ds_9', width_multiplier=width_multiplier)
                     self.conv_ds_9 = net
-                    net = self._depthwise_separable_conv(net, 512, width_multiplier, sc='conv_ds_10')
+                    net = self._depthwise_separable_conv(net, 512, 'conv_ds_10', width_multiplier=width_multiplier)
                     self.conv_ds_10 = net
-                    net = self._depthwise_separable_conv(net, 512, width_multiplier, sc='conv_ds_11')
+                    net = self._depthwise_separable_conv(net, 512, 'conv_ds_11', width_multiplier=width_multiplier)
                     self.conv_ds_11 = net
-                    net = self._depthwise_separable_conv(net, 512, width_multiplier, sc='conv_ds_12')
+                    net = self._depthwise_separable_conv(net, 512, 'conv_ds_12', width_multiplier=width_multiplier)
                     self.conv_ds_12 = net
 
-                    net = self._depthwise_separable_conv(net, 1024, width_multiplier, downsample=True, sc='conv_ds_13')
+                    net = self._depthwise_separable_conv(net, 1024, 'conv_ds_13', width_multiplier=width_multiplier, downsample=True)
                     self.conv_ds_13 = net
-                    net = self._depthwise_separable_conv(net, 1024, width_multiplier, sc='conv_ds_14')
+                    net = self._depthwise_separable_conv(net, 1024, 'conv_ds_14', width_multiplier=width_multiplier)
                     self.conv_ds_14 = net
                     net = slim.avg_pool2d(net, [7, 7], scope='avg_pool_15')
 
