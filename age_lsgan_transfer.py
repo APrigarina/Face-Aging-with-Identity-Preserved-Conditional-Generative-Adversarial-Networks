@@ -12,10 +12,6 @@ from source_input import load_source_batch3
 from utils import save_images, save_source
 from data_generator import ImageDataGenerator
 
-from pycallgraph import PyCallGraph
-from pycallgraph.output import GraphvizOutput
-
-
     
 
 flags = tf.app.flags
