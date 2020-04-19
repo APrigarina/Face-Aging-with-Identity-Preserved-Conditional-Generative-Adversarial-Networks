@@ -148,46 +148,46 @@ class FaceAging(object):
         return bn
 
 
-    def face_age_mobilenet(self, x, scope_name='mobilenet', if_age=False, reuse=False):
+    def face_age_mobilenet(self, x, scope_name='mobilenet', if_age=False, reuse=False, is_training=False):
         with tf.variable_scope(scope_name, reuse=reuse) as sc:
             end_points_collection = sc.name + '_end_points'
             with slim.arg_scope([slim.convolution2d, slim.separable_convolution2d],
                                 activation_fn=None,
                                 outputs_collections=[end_points_collection]):
-            with slim.arg_scope([slim.batch_norm],
-                                is_training=is_training,
-                                activation_fn=tf.nn.relu,
-                                fused=True):
-                net = slim.convolution2d(x, round(32 * width_multiplier), [3, 3], stride=2, padding='SAME', scope='conv_1')
-                net = slim.batch_norm(net, scope='conv_1/batch_norm')
-                net = _depthwise_separable_conv(net, 64, width_multiplier, sc='conv_ds_2')
-                net = _depthwise_separable_conv(net, 128, width_multiplier, downsample=True, sc='conv_ds_3')
-                self.conv_ds_3 = net
-                net = _depthwise_separable_conv(net, 128, width_multiplier, sc='conv_ds_4')
-                self.conv_ds_4 = net
-                net = _depthwise_separable_conv(net, 256, width_multiplier, downsample=True, sc='conv_ds_5')
-                self.conv_ds_5 = net
-                net = _depthwise_separable_conv(net, 256, width_multiplier, sc='conv_ds_6')
-                self.conv_ds_6 = net
-                net = _depthwise_separable_conv(net, 512, width_multiplier, downsample=True, sc='conv_ds_7')
-                self.conv_ds_7 = net
+                with slim.arg_scope([slim.batch_norm],
+                                    is_training=is_training,
+                                    activation_fn=tf.nn.relu,
+                                    fused=True):
+                    net = slim.convolution2d(x, round(32 * width_multiplier), [3, 3], stride=2, padding='SAME', scope='conv_1')
+                    net = slim.batch_norm(net, scope='conv_1/batch_norm')
+                    net = _depthwise_separable_conv(net, 64, width_multiplier, sc='conv_ds_2')
+                    net = _depthwise_separable_conv(net, 128, width_multiplier, downsample=True, sc='conv_ds_3')
+                    self.conv_ds_3 = net
+                    net = _depthwise_separable_conv(net, 128, width_multiplier, sc='conv_ds_4')
+                    self.conv_ds_4 = net
+                    net = _depthwise_separable_conv(net, 256, width_multiplier, downsample=True, sc='conv_ds_5')
+                    self.conv_ds_5 = net
+                    net = _depthwise_separable_conv(net, 256, width_multiplier, sc='conv_ds_6')
+                    self.conv_ds_6 = net
+                    net = _depthwise_separable_conv(net, 512, width_multiplier, downsample=True, sc='conv_ds_7')
+                    self.conv_ds_7 = net
 
-                net = _depthwise_separable_conv(net, 512, width_multiplier, sc='conv_ds_8')
-                self.conv_ds_8 = net
-                net = _depthwise_separable_conv(net, 512, width_multiplier, sc='conv_ds_9')
-                self.conv_ds_9 = net
-                net = _depthwise_separable_conv(net, 512, width_multiplier, sc='conv_ds_10')
-                self.conv_ds_10 = net
-                net = _depthwise_separable_conv(net, 512, width_multiplier, sc='conv_ds_11')
-                self.conv_ds_11 = net
-                net = _depthwise_separable_conv(net, 512, width_multiplier, sc='conv_ds_12')
-                self.conv_ds_12 = net
+                    net = _depthwise_separable_conv(net, 512, width_multiplier, sc='conv_ds_8')
+                    self.conv_ds_8 = net
+                    net = _depthwise_separable_conv(net, 512, width_multiplier, sc='conv_ds_9')
+                    self.conv_ds_9 = net
+                    net = _depthwise_separable_conv(net, 512, width_multiplier, sc='conv_ds_10')
+                    self.conv_ds_10 = net
+                    net = _depthwise_separable_conv(net, 512, width_multiplier, sc='conv_ds_11')
+                    self.conv_ds_11 = net
+                    net = _depthwise_separable_conv(net, 512, width_multiplier, sc='conv_ds_12')
+                    self.conv_ds_12 = net
 
-                net = _depthwise_separable_conv(net, 1024, width_multiplier, downsample=True, sc='conv_ds_13')
-                self.conv_ds_13 = net
-                net = _depthwise_separable_conv(net, 1024, width_multiplier, sc='conv_ds_14')
-                self.conv_ds_14 = net
-                net = slim.avg_pool2d(net, [7, 7], scope='avg_pool_15')
+                    net = _depthwise_separable_conv(net, 1024, width_multiplier, downsample=True, sc='conv_ds_13')
+                    self.conv_ds_13 = net
+                    net = _depthwise_separable_conv(net, 1024, width_multiplier, sc='conv_ds_14')
+                    self.conv_ds_14 = net
+                    net = slim.avg_pool2d(net, [7, 7], scope='avg_pool_15')
 
             end_points = slim.utils.convert_collection_to_dict(end_points_collection)
             net = tf.squeeze(net, [1, 2], name='SpatialSqueeze')
@@ -276,7 +276,7 @@ class FaceAging(object):
         :return:
         """
         print("imgs", imgs)
-        self.face_age_mobilenet(source_img_227, if_age=True)
+        self.face_age_mobilenet(source_img_227, if_age=True, is_training=True)
         conv_ds_14
         if fea_layer_name == 'conv_ds_14':
             source_fea = self.conv_ds_14       
@@ -323,7 +323,7 @@ class FaceAging(object):
         g_source = g_source - self.mean
         print("Okay 4")
 
-        self.face_age_mobilenet(g_source, if_age=True, reuse=True)
+        self.face_age_mobilenet(g_source, if_age=True, reuse=True, is_training=False)
         print("Okay 5")
         self.age_loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
                                                 logits=self.age_logits, labels=age_label)) * self.age_loss_weight
