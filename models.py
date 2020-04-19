@@ -121,7 +121,7 @@ class FaceAging(object):
                 self.age_logits = fc(age_dropout7, 4096, 5, name='age_fc8', relu=False)
 
             return scope
-    def _depthwise_separable_conv(inputs,
+    def _depthwise_separable_conv(self, inputs,
                                 num_pwc_filters,
                                 sc,
                                 width_multiplier=1,
