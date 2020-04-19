@@ -190,9 +190,9 @@ class FaceAging(object):
                     self.conv_ds_14 = net
                     net = slim.avg_pool2d(net, [7, 7], scope='avg_pool_15')
 
-            end_points = slim.utils.convert_collection_to_dict(end_points_collection)
+            # end_points = slim.utils.convert_collection_to_dict(end_points_collection)
             net = tf.squeeze(net, [1, 2], name='SpatialSqueeze')
-            end_points['squeeze'] = net
+            # end_points['squeeze'] = net
             self.face_logits = slim.fully_connected(net, self.NUM_CLASSES, activation_fn=None, scope='fc_16')
             # predictions = slim.softmax(logits, scope='Predictions')
 
@@ -278,7 +278,6 @@ class FaceAging(object):
         """
         print("imgs", imgs)
         self.face_age_mobilenet(source_img_227, if_age=True, is_training=True)
-        conv_ds_14
         if fea_layer_name == 'conv_ds_14':
             source_fea = self.conv_ds_14       
         if fea_layer_name == 'conv3':
@@ -331,7 +330,7 @@ class FaceAging(object):
 
         print("Okay 6")
         if fea_layer_name == 'conv_ds_14':
-            source_fea = self.conv_ds_14  
+            ge_fea = self.conv_ds_14  
         if fea_layer_name == 'conv3':
             ge_fea = self.conv3
         elif fea_layer_name == 'conv4':
@@ -350,7 +349,7 @@ class FaceAging(object):
         g_loss = self.g_loss + self.fea_loss + self.age_loss
         print("Okay 7")
 
-        self.get_vars()
+        self.get_vars_mobilenet()
         print("Okay 8")
 
         d_optim = tf.train.AdamOptimizer(self.learning_rate, beta1=0.5).minimize(self.d_loss,

@@ -12,6 +12,7 @@ from source_input import load_source_batch3
 from utils import save_images, save_source
 from data_generator import ImageDataGenerator
 
+
     
 
 flags = tf.app.flags
@@ -60,7 +61,7 @@ flags.DEFINE_string("root_folder", '/content/drive/My Drive/Diploma/dataset/CACD
 FLAGS = flags.FLAGS
 
 # How often to run a batch through the validation model.
-VAL_INTERVAL = 5000
+VAL_INTERVAL = 100
 
 # How often to save a model checkpoint
 SAVE_INTERVAL = 10000
@@ -105,8 +106,8 @@ def my_train():
         print("Creating savers")
         model.saver = tf.train.Saver(model.save_d_vars + model.save_g_vars, max_to_keep=200)
         print("Model saver", model.save_d_vars + model.save_g_vars)
-        model.alexnet_saver = tf.train.Saver(model.alexnet_vars)
-        print("Model alexnet", model.alexnet_vars)
+        model.mobilenet_saver = tf.train.Saver(model.mobilenet_vars)
+        print("Model alexnet", model.mobilenet_vars)
         model.age_saver = tf.train.Saver(model.age_vars)
         print("Model age", model.age_vars)
 
@@ -144,6 +145,7 @@ def my_train():
         for step in range(FLAGS.max_steps):
             images, t_label_features_128, t_label_features_64, f_label_features_64, age_labels = \
                 train_generator.next_target_batch_transfer2()
+            
             print("images shape", images.shape)
             dict = {imgs: images,
                     true_label_features_128: t_label_features_128,
@@ -164,7 +166,7 @@ def my_train():
             # Save the model checkpoint periodically.
             if step % SAVE_INTERVAL == SAVE_INTERVAL-1 or (step + 1) == FLAGS.max_steps:
                 checkpoint_path = os.path.join(FLAGS.checkpoint_dir)
-                model.save(checkpoint_path, step, 'acgan')
+                model.save(checkpoint_path, step, 'mobilenet_acgan')
 
             if step % VAL_INTERVAL == VAL_INTERVAL-1:
                 if not os.path.exists(FLAGS.sample_dir):
@@ -183,6 +185,7 @@ def my_train():
                             }
                     samples = sess.run(ge_samples, feed_dict=dict)
                     save_images(samples, [4, 8], './{}/test_{:01d}.jpg'.format(path, j))
+                    print("===========> img saved to", './{}/test_{:01d}.jpg'.format(path, j))
 
 def main(argv=None):
     my_train()
