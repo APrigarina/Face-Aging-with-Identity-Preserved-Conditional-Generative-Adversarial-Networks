@@ -276,7 +276,7 @@ class FaceAging(object):
         :return:
         """
         print("imgs", imgs)
-        self.face_age_alexnet(source_img_227, if_age=True)
+        self.face_age_mobilenet(source_img_227, if_age=True)
         conv_ds_14
         if fea_layer_name == 'conv_ds_14':
             source_fea = self.conv_ds_14       
@@ -323,7 +323,7 @@ class FaceAging(object):
         g_source = g_source - self.mean
         print("Okay 4")
 
-        self.face_age_alexnet(g_source, if_age=True, reuse=True)
+        self.face_age_mobilenet(g_source, if_age=True, reuse=True)
         print("Okay 5")
         self.age_loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
                                                 logits=self.age_logits, labels=age_label)) * self.age_loss_weight
@@ -474,8 +474,8 @@ class FaceAging(object):
 
         t_vars = tf.global_variables()
 
-        alexnet_vars = [var for var in t_vars if 'mobilenet' in var.name]
-        self.alexnet_vars = [var for var in alexnet_vars if 'age' not in var.name]
+        mobilenet_vars = [var for var in t_vars if 'mobilenet' in var.name]
+        self.mobilenet_vars = [var for var in mobilenet_vars if 'age' not in var.name]
         self.age_vars = [var for var in t_vars if 'age' in var.name]
 
         self.save_d_vars = [var for var in t_vars if 'discriminator' in var.name]
