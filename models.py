@@ -123,8 +123,8 @@ class FaceAging(object):
             return scope
     def _depthwise_separable_conv(inputs,
                                 num_pwc_filters,
-                                width_multiplier=1,
                                 sc,
+                                width_multiplier=1,
                                 downsample=False):
         """ Helper function to build the depth-wise separable convolution layer.
         """
