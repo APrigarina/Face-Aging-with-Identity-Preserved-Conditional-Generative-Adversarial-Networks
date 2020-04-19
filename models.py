@@ -6,6 +6,7 @@ from tensorflow.python.training import moving_averages
 import sys
 sys.path.append('./tools/')
 from ops import *
+import tensorflow.contrib.slim as slim
 
 class FaceAging(object):
     def __init__(self, sess, lr, keep_prob, model_num, batch_size=64, decay_steps=None,
@@ -15,7 +16,9 @@ class FaceAging(object):
         self.sess = sess
         self.NUM_CLASSES = 2000
         self.KEEP_PROB = keep_prob
-        self.train_layers = ['conv1', 'conv2', 'conv3', 'conv4', 'conv5', 'fc6', 'fc7']
+        # self.train_layers = ['conv1', 'conv2', 'conv3', 'conv4', 'conv5', 'fc6', 'fc7']
+        self.train_layers = ['conv_ds_3', 'conv_ds_4', 'conv_ds_5', 'conv_ds_6', 'conv_ds_7', 'conv_ds_8',
+                             'conv_ds_9', 'conv_ds_10', 'conv_ds_11', 'conv_ds_12', 'conv_ds_13','conv_ds_14'] 
         self.skip_layers = ['fc8']
         self.learning_rate = lr
         self.decay_steps = decay_steps
@@ -118,6 +121,92 @@ class FaceAging(object):
                 self.age_logits = fc(age_dropout7, 4096, 5, name='age_fc8', relu=False)
 
             return scope
+    def _depthwise_separable_conv(inputs,
+                                num_pwc_filters,
+                                width_multiplier,
+                                sc,
+                                downsample=False):
+        """ Helper function to build the depth-wise separable convolution layer.
+        """
+        num_pwc_filters = round(num_pwc_filters * width_multiplier)
+        _stride = 2 if downsample else 1
+
+        # skip pointwise by setting num_outputs=None
+        depthwise_conv = slim.separable_convolution2d(inputs,
+                                                    num_outputs=None,
+                                                    stride=_stride,
+                                                    depth_multiplier=1,
+                                                    kernel_size=[3, 3],
+                                                    scope=sc+'/depthwise_conv')
+
+        bn = slim.batch_norm(depthwise_conv, scope=sc+'/dw_batch_norm')
+        pointwise_conv = slim.convolution2d(bn,
+                                            num_pwc_filters,
+                                            kernel_size=[1, 1],
+                                            scope=sc+'/pointwise_conv')
+        bn = slim.batch_norm(pointwise_conv, scope=sc+'/pw_batch_norm')
+        return bn
+
+
+    def face_age_mobilenet(self, x, scope_name='mobilenet', if_age=False, reuse=False):
+        with tf.variable_scope(scope_name, reuse=reuse) as sc:
+            end_points_collection = sc.name + '_end_points'
+            with slim.arg_scope([slim.convolution2d, slim.separable_convolution2d],
+                                activation_fn=None,
+                                outputs_collections=[end_points_collection]):
+            with slim.arg_scope([slim.batch_norm],
+                                is_training=is_training,
+                                activation_fn=tf.nn.relu,
+                                fused=True):
+                net = slim.convolution2d(x, round(32 * width_multiplier), [3, 3], stride=2, padding='SAME', scope='conv_1')
+                net = slim.batch_norm(net, scope='conv_1/batch_norm')
+                net = _depthwise_separable_conv(net, 64, width_multiplier, sc='conv_ds_2')
+                net = _depthwise_separable_conv(net, 128, width_multiplier, downsample=True, sc='conv_ds_3')
+                self.conv_ds_3 = net
+                net = _depthwise_separable_conv(net, 128, width_multiplier, sc='conv_ds_4')
+                self.conv_ds_4 = net
+                net = _depthwise_separable_conv(net, 256, width_multiplier, downsample=True, sc='conv_ds_5')
+                self.conv_ds_5 = net
+                net = _depthwise_separable_conv(net, 256, width_multiplier, sc='conv_ds_6')
+                self.conv_ds_6 = net
+                net = _depthwise_separable_conv(net, 512, width_multiplier, downsample=True, sc='conv_ds_7')
+                self.conv_ds_7 = net
+
+                net = _depthwise_separable_conv(net, 512, width_multiplier, sc='conv_ds_8')
+                self.conv_ds_8 = net
+                net = _depthwise_separable_conv(net, 512, width_multiplier, sc='conv_ds_9')
+                self.conv_ds_9 = net
+                net = _depthwise_separable_conv(net, 512, width_multiplier, sc='conv_ds_10')
+                self.conv_ds_10 = net
+                net = _depthwise_separable_conv(net, 512, width_multiplier, sc='conv_ds_11')
+                self.conv_ds_11 = net
+                net = _depthwise_separable_conv(net, 512, width_multiplier, sc='conv_ds_12')
+                self.conv_ds_12 = net
+
+                net = _depthwise_separable_conv(net, 1024, width_multiplier, downsample=True, sc='conv_ds_13')
+                self.conv_ds_13 = net
+                net = _depthwise_separable_conv(net, 1024, width_multiplier, sc='conv_ds_14')
+                self.conv_ds_14 = net
+                net = slim.avg_pool2d(net, [7, 7], scope='avg_pool_15')
+
+            end_points = slim.utils.convert_collection_to_dict(end_points_collection)
+            net = tf.squeeze(net, [1, 2], name='SpatialSqueeze')
+            end_points['squeeze'] = net
+            self.face_logits = slim.fully_connected(net, self.NUM_CLASSES, activation_fn=None, scope='fc_16')
+            # predictions = slim.softmax(logits, scope='Predictions')
+
+            # end_points['Logits'] = logits
+            # end_points['Predictions'] = predictions
+
+            if if_age:
+                # age_fc6 = fc(flattened, 6 * 6 * 256, 4096, name='age_fc6')
+                # age_dropout6 = dropout(age_fc6, self.KEEP_PROB)
+                # # 7th Layer: FC (w ReLu) -> Dropout
+                # age_fc7 = fc(age_dropout6, 4096, 4096, name='age_fc7')
+                # age_dropout7 = dropout(age_fc7, self.KEEP_PROB)
+                self.age_logits = slim.fully_connected(net, 5, activation_fn=None, scope='age_fc_16')
+
+            return sc
 
     def ResnetGenerator(self, image, name, n_blocks=6, condition=None, mode='train', reuse=False):
         with tf.variable_scope(name):
@@ -188,6 +277,9 @@ class FaceAging(object):
         """
         print("imgs", imgs)
         self.face_age_alexnet(source_img_227, if_age=True)
+        conv_ds_14
+        if fea_layer_name == 'conv_ds_14':
+            source_fea = self.conv_ds_14       
         if fea_layer_name == 'conv3':
             source_fea = self.conv3
         elif fea_layer_name == 'conv4':
@@ -237,6 +329,8 @@ class FaceAging(object):
                                                 logits=self.age_logits, labels=age_label)) * self.age_loss_weight
 
         print("Okay 6")
+        if fea_layer_name == 'conv_ds_14':
+            source_fea = self.conv_ds_14  
         if fea_layer_name == 'conv3':
             ge_fea = self.conv3
         elif fea_layer_name == 'conv4':
@@ -375,7 +469,24 @@ class FaceAging(object):
         t_vars = tf.trainable_variables()
         self.d_vars = [var for var in t_vars if 'discriminator' in var.name]
         self.g_vars = [var for var in t_vars if 'generator' in var.name]
+    
+    def get_vars_mobilenet(self):
 
+        t_vars = tf.global_variables()
+
+        alexnet_vars = [var for var in t_vars if 'mobilenet' in var.name]
+        self.alexnet_vars = [var for var in alexnet_vars if 'age' not in var.name]
+        self.age_vars = [var for var in t_vars if 'age' in var.name]
+
+        self.save_d_vars = [var for var in t_vars if 'discriminator' in var.name]
+        self.save_g_vars = [var for var in t_vars if 'generator' in var.name]
+        for var in self.save_g_vars:
+            print(var.name)
+
+        t_vars = tf.trainable_variables()
+        self.d_vars = [var for var in t_vars if 'discriminator' in var.name]
+        self.g_vars = [var for var in t_vars if 'generator' in var.name]
+    
     def save(self, checkpoint_dir, step, prefix):
         model_name = prefix + '.model'
         if not os.path.exists(checkpoint_dir):

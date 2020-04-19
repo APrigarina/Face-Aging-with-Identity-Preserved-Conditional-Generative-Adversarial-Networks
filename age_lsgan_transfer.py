@@ -127,15 +127,20 @@ def my_train():
 
         # print("age_lsgan before restore ",FLAGS.checkpoint_dir, model.saver )
         
-        print("alexnet_saver before restore ",FLAGS.alexnet_pretrained_model )
-        model.alexnet_saver.restore(sess, FLAGS.alexnet_pretrained_model)
-        print("age_saver before restore ",FLAGS.age_pretrained_model )
-        model.age_saver.restore(sess, FLAGS.age_pretrained_model)
-        print("==========load===========")
-        if model.load(FLAGS.checkpoint_dir, model.saver):
-            print(" [*] Load SUCCESS")
-        else:
-            print(" [!] Load failed...")
+        # print("alexnet_saver before restore ",FLAGS.alexnet_pretrained_model )
+        # model.alexnet_saver.restore(sess, FLAGS.alexnet_pretrained_model)
+        # print("age_saver before restore ",FLAGS.age_pretrained_model )
+        # model.age_saver.restore(sess, FLAGS.age_pretrained_model)
+        #FLAGS.checkpoint_dir, model.saver, 'acgan', 399999
+        # print("==========load===========")
+        # print("BEFORE")
+        # for v in tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES):
+        #   print(v)
+        # v1 = tf.get_variable('alexnet/conv5/weights', shape=[4])
+        # if model.load(FLAGS.checkpoint_dir, model.saver, 'acgan', 399999):
+        #     print(" [*] Load SUCCESS")
+        # else:
+        #     print(" [!] Load failed...")
 
         print("{} Start training...")
 

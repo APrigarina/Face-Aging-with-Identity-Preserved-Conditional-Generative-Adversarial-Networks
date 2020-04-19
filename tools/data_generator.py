@@ -32,7 +32,7 @@ class ImageDataGenerator:
                                'test_age_group_4.txt']
             self.pointer = [0, 0, 0, 0, 0, 0]
 
-        self.train_label_pair = 'train_label_pair.txt'
+        self.train_label_pair = 'tools/train_label_pair.txt'
         self.true_labels = []
         self.false_labels = []
         self.images = []
@@ -50,7 +50,7 @@ class ImageDataGenerator:
         self.z_dim = z_dim
         self.img_size = self.height
 
-        # self.read_class_list(self.class_lists)
+        self.read_class_list(self.class_lists)
         if self.shuffle:
             self.shuffle_data(shuffle_all=True)
 

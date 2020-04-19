@@ -19,8 +19,8 @@ from PIL import Image
 FLAGS = flags.FLAGS
 
 T = 1
-IM_HEIGHT = 400
-IM_WIDTH = 400
+IM_HEIGHT = 250
+IM_WIDTH = 250
 IM_CHANNELS = 3
 
 
