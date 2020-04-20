@@ -181,12 +181,12 @@ class FaceAging(object):
                     self.conv_ds_10 = net
                     net = self._depthwise_separable_conv(net, 512, 'conv_ds_11')
                     self.conv_ds_11 = net
-                    12_net = self._depthwise_separable_conv(net, 512, 'conv_ds_12')
-                    self.conv_ds_12 = 12_net
+                    net_12 = self._depthwise_separable_conv(net, 512, 'conv_ds_12')
+                    self.conv_ds_12 = net_12
 
-                    net = self._depthwise_separable_conv(12_net, 1024, 'conv_ds_13', downsample=True)
+                    net = self._depthwise_separable_conv(net_12, 1024, 'conv_ds_13', downsample=True)
                     self.conv_ds_13 = net
-                    net = self._depthwise_separable_conv(13_net, 1024, 'conv_ds_14')
+                    net = self._depthwise_separable_conv(net, 1024, 'conv_ds_14')
                     self.conv_ds_14 = net
                     net = slim.avg_pool2d(net, [7, 7], scope='avg_pool_15')
 
@@ -200,7 +200,7 @@ class FaceAging(object):
             # end_points['Predictions'] = predictions
 
             if if_age:
-                age_net_13 = self._depthwise_separable_conv(12_net, 1024, 'conv_ds_13', downsample=True)
+                age_net_13 = self._depthwise_separable_conv(net_12, 1024, 'conv_ds_13', downsample=True)
                 
                 age_net_14 = self._depthwise_separable_conv(age_net_13, 1024, 'conv_ds_14')
                 
