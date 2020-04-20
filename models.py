@@ -200,12 +200,12 @@ class FaceAging(object):
             # end_points['Predictions'] = predictions
 
             if if_age:
-                age_net_13 = self._depthwise_separable_conv(net_12, 1024, 'conv_ds_13', downsample=True)
+                age_net_13 = self._depthwise_separable_conv(net_12, 1024, 'age_conv_ds_13', downsample=True)
                 
-                age_net_14 = self._depthwise_separable_conv(age_net_13, 1024, 'conv_ds_14')
+                age_net_14 = self._depthwise_separable_conv(age_net_13, 1024, 'age_conv_ds_14')
                 
-                age_net_15 = slim.avg_pool2d(age_net_14, [7, 7], scope='avg_pool_15')
-                age_net = tf.squeeze(net, [1, 2], name='SpatialSqueeze')
+                age_net_15 = slim.avg_pool2d(age_net_14, [7, 7], scope='age_avg_pool_15')
+                age_net = tf.squeeze(net, [1, 2], name='AgeSpatialSqueeze')
                 self.age_logits = slim.fully_connected(age_net, 5, activation_fn=None, scope='age_fc_16')
 
             return sc
