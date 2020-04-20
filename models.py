@@ -181,12 +181,12 @@ class FaceAging(object):
                     self.conv_ds_10 = net
                     net = self._depthwise_separable_conv(net, 512, 'conv_ds_11')
                     self.conv_ds_11 = net
-                    net = self._depthwise_separable_conv(net, 512, 'conv_ds_12')
-                    self.conv_ds_12 = net
+                    12_net = self._depthwise_separable_conv(net, 512, 'conv_ds_12')
+                    self.conv_ds_12 = 12_net
 
-                    net = self._depthwise_separable_conv(net, 1024, 'conv_ds_13', downsample=True)
+                    net = self._depthwise_separable_conv(12_net, 1024, 'conv_ds_13', downsample=True)
                     self.conv_ds_13 = net
-                    net = self._depthwise_separable_conv(net, 1024, 'conv_ds_14')
+                    net = self._depthwise_separable_conv(13_net, 1024, 'conv_ds_14')
                     self.conv_ds_14 = net
                     net = slim.avg_pool2d(net, [7, 7], scope='avg_pool_15')
 
@@ -200,12 +200,13 @@ class FaceAging(object):
             # end_points['Predictions'] = predictions
 
             if if_age:
-                # age_fc6 = fc(flattened, 6 * 6 * 256, 4096, name='age_fc6')
-                # age_dropout6 = dropout(age_fc6, self.KEEP_PROB)
-                # # 7th Layer: FC (w ReLu) -> Dropout
-                # age_fc7 = fc(age_dropout6, 4096, 4096, name='age_fc7')
-                # age_dropout7 = dropout(age_fc7, self.KEEP_PROB)
-                self.age_logits = slim.fully_connected(net, 5, activation_fn=None, scope='age_fc_16')
+                age_net_13 = self._depthwise_separable_conv(12_net, 1024, 'conv_ds_13', downsample=True)
+                
+                age_net_14 = self._depthwise_separable_conv(age_net_13, 1024, 'conv_ds_14')
+                
+                age_net_15 = slim.avg_pool2d(age_net_14, [7, 7], scope='avg_pool_15')
+                age_net = tf.squeeze(net, [1, 2], name='SpatialSqueeze')
+                self.age_logits = slim.fully_connected(age_net, 5, activation_fn=None, scope='age_fc_16')
 
             return sc
 

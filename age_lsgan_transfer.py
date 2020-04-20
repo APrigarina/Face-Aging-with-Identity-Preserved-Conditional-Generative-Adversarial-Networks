@@ -184,8 +184,8 @@ def my_train():
                             true_label_features_128: true_label_fea
                             }
                     samples = sess.run(ge_samples, feed_dict=dict)
-                    save_images(samples, [4, 8], './{}/test_{:01d}.jpg'.format(path, j))
-                    print("===========> img saved to", './{}/test_{:01d}.jpg'.format(path, j))
+                    save_images(samples, [4, 8], '{}/test_{:01d}.jpg'.format(path, j))
+                    print("===========> img saved to", '{}/test_{:01d}.jpg'.format(path, j))
 
 def main(argv=None):
     my_train()
