@@ -156,7 +156,6 @@ class FaceAging(object):
                                 activation_fn=None,
                                 outputs_collections=[end_points_collection]):
                 with slim.arg_scope([slim.batch_norm],
-                                    is_training=is_training,
                                     activation_fn=tf.nn.relu,
                                     fused=True):
                     net = slim.convolution2d(x, round(32 * width_multiplier), [3, 3], stride=2, padding='SAME', scope='conv_1')
