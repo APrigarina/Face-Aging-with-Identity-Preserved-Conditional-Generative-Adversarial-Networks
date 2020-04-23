@@ -193,7 +193,7 @@ class FaceAging(object):
                     #     age_net = self._depthwise_separable_conv(last_net, 1024, 'age_conv_ds_14')
                     #     age_net = slim.avg_pool2d(age_net, [7, 7], scope='age_avg_pool_15')
 
-            # net = tf.squeeze(net, [1, 2], name='SpatialSqueeze')
+            net = tf.squeeze(net, [1, 2], name='SpatialSqueeze')
             net = tf.nn.dropout(net, rate = 0.5)
             self.face_logits = slim.fully_connected(net, self.NUM_CLASSES, activation_fn=None, scope='fc_16')
 
