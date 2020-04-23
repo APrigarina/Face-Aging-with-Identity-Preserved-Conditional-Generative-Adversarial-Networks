@@ -156,6 +156,7 @@ class FaceAging(object):
                                 activation_fn=None,
                                 outputs_collections=[end_points_collection]):
                 with slim.arg_scope([slim.batch_norm],
+                                    is_training=is_training,
                                     activation_fn=tf.nn.relu,
                                     fused=True):
                     net = slim.convolution2d(x, round(32 * width_multiplier), [3, 3], stride=2, padding='SAME', scope='conv_1')
@@ -180,32 +181,24 @@ class FaceAging(object):
                     self.conv_ds_10 = net
                     net = self._depthwise_separable_conv(net, 512, 'conv_ds_11')
                     self.conv_ds_11 = net
-                    net_12 = self._depthwise_separable_conv(net, 512, 'conv_ds_12')
-                    self.conv_ds_12 = net_12
+                    net = self._depthwise_separable_conv(net, 512, 'conv_ds_12')
+                    self.conv_ds_12 = net
 
-                    net = self._depthwise_separable_conv(net_12, 1024, 'conv_ds_13', downsample=True)
+                    net = self._depthwise_separable_conv(net, 1024, 'conv_ds_13', downsample=True)
                     self.conv_ds_13 = net
                     net = self._depthwise_separable_conv(net, 1024, 'conv_ds_14')
                     self.conv_ds_14 = net
                     net = slim.avg_pool2d(net, [7, 7], scope='avg_pool_15')
+                    # if if_age: 
+                    #     age_net = self._depthwise_separable_conv(last_net, 1024, 'age_conv_ds_14')
+                    #     age_net = slim.avg_pool2d(age_net, [7, 7], scope='age_avg_pool_15')
 
-            # end_points = slim.utils.convert_collection_to_dict(end_points_collection)
-            net = tf.squeeze(net, [1, 2], name='SpatialSqueeze')
-            # end_points['squeeze'] = net
+            # net = tf.squeeze(net, [1, 2], name='SpatialSqueeze')
+            net = tf.nn.dropout(net, rate = 0.5)
             self.face_logits = slim.fully_connected(net, self.NUM_CLASSES, activation_fn=None, scope='fc_16')
-            # predictions = slim.softmax(logits, scope='Predictions')
-
-            # end_points['Logits'] = logits
-            # end_points['Predictions'] = predictions
 
             if if_age:
-                age_net_13 = self._depthwise_separable_conv(net_12, 1024, 'age_conv_ds_13', downsample=True)
-                
-                age_net_14 = self._depthwise_separable_conv(age_net_13, 1024, 'age_conv_ds_14')
-                
-                age_net_15 = slim.avg_pool2d(age_net_14, [7, 7], scope='age_avg_pool_15')
-                age_net = tf.squeeze(age_net_15, [1, 2], name='AgeSpatialSqueeze')
-                self.age_logits = slim.fully_connected(age_net, 5, activation_fn=None, scope='age_fc_16')
+                self.age_logits = slim.fully_connected(net, 5, activation_fn=None, scope='age_fc_16')
 
             return sc
 
@@ -323,7 +316,7 @@ class FaceAging(object):
         g_source = g_source - self.mean
         print("Okay 4")
 
-        self.face_age_mobilenet(g_source, if_age=True, reuse=True, is_training=False)
+        self.face_age_mobilenet(g_source, if_age=True, reuse=True, is_training=True)
         print("Okay 5")
         self.age_loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
                                                 logits=self.age_logits, labels=age_label)) * self.age_loss_weight
