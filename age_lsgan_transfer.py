@@ -146,7 +146,7 @@ def my_train():
             images, t_label_features_128, t_label_features_64, f_label_features_64, age_labels = \
                 train_generator.next_target_batch_transfer2()
             
-            print("images shape", images.shape)
+            # print("images shape", images.shape)
             dict = {imgs: images,
                     true_label_features_128: t_label_features_128,
                     true_label_features_64: t_label_features_64,
@@ -161,7 +161,8 @@ def my_train():
                                                          feed_dict=dict)
 
             format_str = ('%s: step %d, d_loss = %.3f, g_loss = %.3f, fea_loss=%.3f, age_loss=%.3f')
-            print(format_str % (datetime.now(), step, d_loss, g_loss, fea_loss, age_loss))
+            if step % 10 == 0: 
+                print(format_str % (datetime.now(), step, d_loss, g_loss, fea_loss, age_loss))
 
             # Save the model checkpoint periodically.
             if step % SAVE_INTERVAL == SAVE_INTERVAL-1 or (step + 1) == FLAGS.max_steps:

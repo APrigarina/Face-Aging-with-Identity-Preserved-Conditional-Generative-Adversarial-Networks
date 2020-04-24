@@ -125,7 +125,8 @@ class FaceAging(object):
                                 num_pwc_filters,
                                 sc,
                                 width_multiplier=1,
-                                downsample=False):
+                                downsample=False,
+                                fea_extraction=False):
         """ Helper function to build the depth-wise separable convolution layer.
         """
         num_pwc_filters = round(num_pwc_filters * width_multiplier)
@@ -138,7 +139,8 @@ class FaceAging(object):
                                                     depth_multiplier=1,
                                                     kernel_size=[3, 3],
                                                     scope=sc+'/depthwise_conv')
-
+        if fea_extraction:
+            self.ds_conv = depthwise_conv
         bn = slim.batch_norm(depthwise_conv, scope=sc+'/dw_batch_norm')
         pointwise_conv = slim.convolution2d(bn,
                                             num_pwc_filters,
@@ -186,7 +188,7 @@ class FaceAging(object):
 
                     net = self._depthwise_separable_conv(net, 1024, 'conv_ds_13', downsample=True)
                     self.conv_ds_13 = net
-                    net = self._depthwise_separable_conv(net, 1024, 'conv_ds_14')
+                    net = self._depthwise_separable_conv(net, 1024, 'conv_ds_14', fea_extraction=True)
                     self.conv_ds_14 = net
                     net = slim.avg_pool2d(net, [7, 7], scope='avg_pool_15')
                     # if if_age: 
@@ -271,8 +273,14 @@ class FaceAging(object):
         """
         print("imgs", imgs)
         self.face_age_mobilenet(source_img_227, if_age=True, is_training=True)
+        if fea_layer_name == 'ds_conv':
+            source_fea = self.ds_conv 
+        if fea_layer_name == 'conv_ds_12':
+            source_fea = self.conv_ds_12       
+        if fea_layer_name == 'conv_ds_13':
+            source_fea = self.conv_ds_13 
         if fea_layer_name == 'conv_ds_14':
-            source_fea = self.conv_ds_14       
+            source_fea = self.conv_ds_14 
         if fea_layer_name == 'conv3':
             source_fea = self.conv3
         elif fea_layer_name == 'conv4':
@@ -322,6 +330,10 @@ class FaceAging(object):
                                                 logits=self.age_logits, labels=age_label)) * self.age_loss_weight
 
         print("Okay 6")
+        if fea_layer_name == 'ds_conv':
+            ge_fea = self.ds_conv  
+        if fea_layer_name == 'conv_ds_13':
+            ge_fea = self.conv_ds_13  
         if fea_layer_name == 'conv_ds_14':
             ge_fea = self.conv_ds_14  
         if fea_layer_name == 'conv3':
