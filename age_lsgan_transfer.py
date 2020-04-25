@@ -153,7 +153,6 @@ def my_train():
                     false_label_features_64: f_label_features_64,
                     age_label: age_labels
                     }
-            print(dict)
             for i in range(d_iter):
                 _, d_loss = sess.run([model.d_optim, d_error], feed_dict=dict)
 
