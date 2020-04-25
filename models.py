@@ -182,9 +182,9 @@ class FaceAging(object):
 
                     net = self._depthwise_separable_conv(last_net, 1024, 'conv_ds_13', downsample=True)
                     self.conv_ds_13 = net
-                    net = self._depthwise_separable_conv(net, 1024, 'conv_ds_14')
-                    self.conv_ds_14 = net
-                    net = slim.avg_pool2d(net, [7, 7], scope='avg_pool_15')
+                    last_net = self._depthwise_separable_conv(net, 1024, 'conv_ds_14')
+                    self.conv_ds_14 = last_net
+                    net = slim.avg_pool2d(last_net, [7, 7], scope='avg_pool_15')
                     # if if_age: 
                         # age_net = self._depthwise_separable_conv(last_net, 1024, 'age_conv_ds_13', downsample=True)
                         # age_net = self._depthwise_separable_conv(age_net, 1024, 'age_conv_ds_14')
@@ -193,12 +193,13 @@ class FaceAging(object):
             # net = slim.fully_connected(net, 1024, activation_fn=None, scope='fc_16')
             net = tf.squeeze(net, [1, 2], name='SpatialSqueeze')
             # net = tf.nn.dropout(net, rate = 0.5)
-            self.face_logits = slim.fully_connected(net, self.NUM_CLASSES, activation_fn=None, scope='fc_17')
+            self.face_logits = slim.fully_connected(net, self.NUM_CLASSES, activation_fn=None, scope='fc_16')
 
             if if_age:
-                age_net = slim.fully_connected(net, 1024, activation_fn=None, scope='age_fc_16')
+                age_net = tf.nn.dropout(last_net, rate = 0.5)
+                age_net = slim.fully_connected(age_net, 256, activation_fn=None, scope='age_fc_16')
+                age_net = tf.nn.dropout(age_net, rate = 0.2)
                 age_net = tf.squeeze(age_net, [1, 2], name='age_SpatialSqueeze')
-                age_net = tf.nn.dropout(age_net, rate = 0.5)
                 self.age_logits = slim.fully_connected(age_net, 5, activation_fn=None, scope='age_fc_17')
 
             return sc
