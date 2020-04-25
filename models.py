@@ -148,17 +148,13 @@ class FaceAging(object):
         return bn
 
 
-    def face_age_mobilenet(self, x, scope_name='mobilenet', if_age=False, reuse=False, is_training=False):
+    def face_age_mobilenet(self, x, scope_name='mobilenet', if_age=False, reuse=False):
         width_multiplier=1
         with tf.variable_scope(scope_name, reuse=reuse) as sc:
-            end_points_collection = sc.name + '_end_points'
             with slim.arg_scope([slim.convolution2d, slim.separable_convolution2d],
-                                activation_fn=None,
-                                outputs_collections=[end_points_collection]):
+                                activation_fn=None):
                 with slim.arg_scope([slim.batch_norm],
-                                    is_training=is_training,
-                                    activation_fn=tf.nn.relu,
-                                    fused=True):
+                                    activation_fn=tf.nn.relu):
                     net = slim.convolution2d(x, round(32 * width_multiplier), [3, 3], stride=2, padding='SAME', scope='conv_1')
                     net = slim.batch_norm(net, scope='conv_1/batch_norm')
                     net = self._depthwise_separable_conv(net, 64, 'conv_ds_2')
@@ -189,10 +185,10 @@ class FaceAging(object):
                     net = self._depthwise_separable_conv(net, 1024, 'conv_ds_14')
                     self.conv_ds_14 = net
                     net = slim.avg_pool2d(net, [7, 7], scope='avg_pool_15')
-                    if if_age: 
-                        age_net = self._depthwise_separable_conv(last_net, 1024, 'age_conv_ds_13', downsample=True)
-                        age_net = self._depthwise_separable_conv(age_net, 1024, 'age_conv_ds_14')
-                        age_net = slim.avg_pool2d(age_net, [7, 7], scope='age_avg_pool_15')
+                    # if if_age: 
+                        # age_net = self._depthwise_separable_conv(last_net, 1024, 'age_conv_ds_13', downsample=True)
+                        # age_net = self._depthwise_separable_conv(age_net, 1024, 'age_conv_ds_14')
+                        # age_net = slim.avg_pool2d(age_net, [7, 7], scope='age_avg_pool_15')
 
             # net = slim.fully_connected(net, 1024, activation_fn=None, scope='fc_16')
             net = tf.squeeze(net, [1, 2], name='SpatialSqueeze')
@@ -200,7 +196,7 @@ class FaceAging(object):
             self.face_logits = slim.fully_connected(net, self.NUM_CLASSES, activation_fn=None, scope='fc_17')
 
             if if_age:
-                age_net = slim.fully_connected(age_net, 1024, activation_fn=None, scope='age_fc_16')
+                age_net = slim.fully_connected(net, 1024, activation_fn=None, scope='age_fc_16')
                 age_net = tf.squeeze(age_net, [1, 2], name='age_SpatialSqueeze')
                 age_net = tf.nn.dropout(age_net, rate = 0.5)
                 self.age_logits = slim.fully_connected(age_net, 5, activation_fn=None, scope='age_fc_17')
@@ -275,7 +271,7 @@ class FaceAging(object):
         :return:
         """
         print("imgs", imgs)
-        self.face_age_mobilenet(source_img_227, if_age=True, is_training=True)
+        self.face_age_mobilenet(source_img_227, if_age=True)
         if fea_layer_name == 'ds_conv':
             source_fea = self.ds_conv 
         if fea_layer_name == 'conv_ds_12':
@@ -327,7 +323,7 @@ class FaceAging(object):
         g_source = g_source - self.mean
         print("Okay 4")
 
-        self.face_age_mobilenet(g_source, if_age=True, reuse=True, is_training=True)
+        self.face_age_mobilenet(g_source, if_age=True, reuse=True)
         print("Okay 5")
         self.age_loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
                                                 logits=self.age_logits, labels=age_label)) * self.age_loss_weight
@@ -336,7 +332,9 @@ class FaceAging(object):
         if fea_layer_name == 'ds_conv':
             ge_fea = self.ds_conv  
         if fea_layer_name == 'conv_ds_13':
-            ge_fea = self.conv_ds_13  
+            ge_fea = self.conv_ds_13 
+        if fea_layer_name == 'conv_ds_12':
+            ge_fea = self.conv_ds_12  
         if fea_layer_name == 'conv_ds_14':
             ge_fea = self.conv_ds_14  
         if fea_layer_name == 'conv3':

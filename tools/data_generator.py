@@ -467,7 +467,8 @@ class ImageDataGenerator:
 
 
 def process_target_img(root_folder, img_path, img_size):
-    img = cv2.imread(root_folder + img_path)
+    full_path = root_folder + img_path
+    img = cv2.imread(full_path)
     img = img[:, :, [2, 1, 0]]
     # rescale image
     img = cv2.resize(img, (img_size, img_size))
