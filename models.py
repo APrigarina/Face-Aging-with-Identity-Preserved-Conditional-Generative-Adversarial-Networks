@@ -196,11 +196,9 @@ class FaceAging(object):
             self.face_logits = slim.fully_connected(net, self.NUM_CLASSES, activation_fn=None, scope='fc_16')
 
             if if_age:
-                # age_net = tf.nn.dropout(last_net, rate = 0.5)
-                # age_net = slim.fully_connected(age_net, 256, activation_fn=None, scope='age_fc_16')
-                # age_net = tf.nn.dropout(age_net, rate = 0.2)
-                # net = slim.avg_pool2d(age_net, [7, 7], scope='avg_pool_15')
-                # age_net = tf.squeeze(age_net, [1, 2], name='age_SpatialSqueeze')
+                age_net = tf.nn.dropout(net, rate = 0.5)
+                age_net = slim.fully_connected(age_net, 256, activation_fn=tf.nn.relu, scope='age_fc_16')
+                age_net = tf.nn.dropout(age_net, rate = 0.2)
                 self.age_logits = slim.fully_connected(age_net, 5, activation_fn=None, scope='age_fc_17')
 
             return sc
