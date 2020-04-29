@@ -138,57 +138,52 @@ class FaceAging(object):
                                                     stride=_stride,
                                                     depth_multiplier=1,
                                                     kernel_size=[3, 3],
-                                                    scope=sc+'/depthwise_conv')
-        bn = slim.batch_norm(depthwise_conv, scope=sc+'/dw_batch_norm')
+                                                    scope=sc+'/depthwise_conv',
+                                                    activation_fn=None)
+        bn = slim.batch_norm(depthwise_conv, scope=sc+'/dw_batch_norm', activation_fn=tf.nn.relu)
         pointwise_conv = slim.convolution2d(bn,
                                             num_pwc_filters,
                                             kernel_size=[1, 1],
-                                            scope=sc+'/pointwise_conv')
-        bn = slim.batch_norm(pointwise_conv, scope=sc+'/pw_batch_norm')
+                                            scope=sc+'/pointwise_conv',
+                                            activation_fn=None)
+        bn = slim.batch_norm(pointwise_conv, scope=sc+'/pw_batch_norm', activation_fn=tf.nn.relu)
         return bn
 
 
     def face_age_mobilenet(self, x, scope_name='mobilenet', if_age=False, reuse=False):
         width_multiplier=1
         with tf.variable_scope(scope_name, reuse=reuse) as sc:
-            with slim.arg_scope([slim.convolution2d, slim.separable_convolution2d],
-                                activation_fn=None):
-                with slim.arg_scope([slim.batch_norm],
-                                    activation_fn=tf.nn.relu):
-                    net = slim.convolution2d(x, round(32 * width_multiplier), [3, 3], stride=2, padding='SAME', scope='conv_1')
-                    net = slim.batch_norm(net, scope='conv_1/batch_norm')
-                    net = self._depthwise_separable_conv(net, 64, 'conv_ds_2')
-                    net = self._depthwise_separable_conv(net, 128, 'conv_ds_3', downsample=True)
-                    self.conv_ds_3 = net
-                    net = self._depthwise_separable_conv(net, 128, 'conv_ds_4')
-                    self.conv_ds_4 = net
-                    net = self._depthwise_separable_conv(net, 256, 'conv_ds_5', downsample=True)
-                    self.conv_ds_5 = net
-                    net = self._depthwise_separable_conv(net, 256, 'conv_ds_6')
-                    self.conv_ds_6 = net
-                    net = self._depthwise_separable_conv(net, 512, 'conv_ds_7', downsample=True)
-                    self.conv_ds_7 = net
+            net = slim.convolution2d(x, round(32 * width_multiplier), [3, 3], stride=2, padding='SAME', scope='conv_1', activation_fn=None)
+            net = slim.batch_norm(net, scope='conv_1/batch_norm', activation_fn=tf.nn.relu)
+            net = self._depthwise_separable_conv(net, 64, 'conv_ds_2')
+            net = self._depthwise_separable_conv(net, 128, 'conv_ds_3', downsample=True)
+            self.conv_ds_3 = net
+            net = self._depthwise_separable_conv(net, 128, 'conv_ds_4')
+            self.conv_ds_4 = net
+            net = self._depthwise_separable_conv(net, 256, 'conv_ds_5', downsample=True)
+            self.conv_ds_5 = net
+            net = self._depthwise_separable_conv(net, 256, 'conv_ds_6')
+            self.conv_ds_6 = net
+            net = self._depthwise_separable_conv(net, 512, 'conv_ds_7', downsample=True)
+            self.conv_ds_7 = net
 
-                    net = self._depthwise_separable_conv(net, 512, 'conv_ds_8')
-                    self.conv_ds_8 = net
-                    net = self._depthwise_separable_conv(net, 512, 'conv_ds_9')
-                    self.conv_ds_9 = net
-                    net = self._depthwise_separable_conv(net, 512, 'conv_ds_10')
-                    self.conv_ds_10 = net
-                    net = self._depthwise_separable_conv(net, 512, 'conv_ds_11')
-                    self.conv_ds_11 = net
-                    last_net = self._depthwise_separable_conv(net, 512, 'conv_ds_12', fea_extraction=True)
-                    self.conv_ds_12 = last_net
+            net = self._depthwise_separable_conv(net, 512, 'conv_ds_8')
+            self.conv_ds_8 = net
+            net = self._depthwise_separable_conv(net, 512, 'conv_ds_9')
+            self.conv_ds_9 = net
+            net = self._depthwise_separable_conv(net, 512, 'conv_ds_10')
+            self.conv_ds_10 = net
+            net = self._depthwise_separable_conv(net, 512, 'conv_ds_11')
+            self.conv_ds_11 = net
+            net = self._depthwise_separable_conv(net, 512, 'conv_ds_12', fea_extraction=True)
+            self.conv_ds_12 = net
 
-                    net = self._depthwise_separable_conv(last_net, 1024, 'conv_ds_13', downsample=True)
-                    self.conv_ds_13 = net
-                    last_net = self._depthwise_separable_conv(net, 1024, 'conv_ds_14')
-                    self.conv_ds_14 = last_net
-                    net = slim.avg_pool2d(last_net, [7, 7], scope='avg_pool_15')
-                    # if if_age: 
-                        # age_net = self._depthwise_separable_conv(last_net, 1024, 'age_conv_ds_13', downsample=True)
-                        # age_net = self._depthwise_separable_conv(age_net, 1024, 'age_conv_ds_14')
-                        # age_net = slim.avg_pool2d(age_net, [7, 7], scope='age_avg_pool_15')
+            net = self._depthwise_separable_conv(last_net, 1024, 'conv_ds_13', downsample=True)
+            self.conv_ds_13 = net
+            net = self._depthwise_separable_conv(net, 1024, 'conv_ds_14')
+            self.conv_ds_14 = net
+            net = slim.avg_pool2d(net, [7, 7], scope='avg_pool_15')
+     
 
             # net = slim.fully_connected(net, 1024, activation_fn=None, scope='fc_16')
             net = tf.squeeze(net, [1, 2], name='SpatialSqueeze')
