@@ -219,7 +219,7 @@ class FaceAging(object):
             net = self._depthwise_separable_conv2d(net, 512, width_multiplier, "ds_conv_12", is_training=is_training)  # ->[N, 14, 14, 512]
             net = self._depthwise_separable_conv2d(net, 1024, width_multiplier, "ds_conv_13", downsample=True, is_training=is_training) # ->[N, 7, 7, 1024]
             net = self._depthwise_separable_conv2d(net, 1024, width_multiplier, "ds_conv_14", is_training=is_training) # ->[N, 7, 7, 1024]
-            self.ds_conv_14 = net
+            self.conv_ds_14 = net
             net = self.avg_pool(net, 7, "avg_pool_15")
             net = tf.squeeze(net, [1, 2], name="SpatialSqueeze")
             self.face_logits = self.fc(net, self.NUM_CLASSES, "fc_16")
