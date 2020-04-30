@@ -135,14 +135,14 @@ class FaceAging(object):
         axis = list(range(len(inputs_shape) - 1))
 
         with tf.variable_scope(scope):
-            beta = create_variable("beta", params_shape,
+            beta = self.create_variable("beta", params_shape,
                                 initializer=tf.zeros_initializer())
-            gamma = create_variable("gamma", params_shape,
+            gamma = self.create_variable("gamma", params_shape,
                                     initializer=tf.ones_initializer())
             # for inference
-            moving_mean = create_variable("moving_mean", params_shape,
+            moving_mean = self.create_variable("moving_mean", params_shape,
                                 initializer=tf.zeros_initializer(), trainable=False)
-            moving_variance = create_variable("moving_variance", params_shape,
+            moving_variance = self.create_variable("moving_variance", params_shape,
                                 initializer=tf.ones_initializer(), trainable=False)
         if is_training:
             mean, variance = tf.nn.moments(inputs, axes=axis)
@@ -161,7 +161,7 @@ class FaceAging(object):
         inputs_shape = inputs.get_shape().as_list()
         in_channels = inputs_shape[-1]
         with tf.variable_scope(scope):
-            filter = create_variable("filter", shape=[filter_size, filter_size,
+            filter = self.create_variable("filter", shape=[filter_size, filter_size,
                                                     in_channels, channel_multiplier],
                         initializer=tf.truncated_normal_initializer(stddev=0.01))
 
@@ -173,7 +173,7 @@ class FaceAging(object):
         inputs_shape = inputs.get_shape().as_list()
         in_channels = inputs_shape[-1]
         with tf.variable_scope(scope):
-            filter = create_variable("filter", shape=[filter_size, filter_size,
+            filter = self.create_variable("filter", shape=[filter_size, filter_size,
                                                     in_channels, num_filters],
                             initializer=tf.truncated_normal_initializer(stddev=0.01))
         return tf.nn.conv2d(inputs, filter, strides=[1, strides, strides, 1],
@@ -190,10 +190,10 @@ class FaceAging(object):
         inputs_shape = inputs.get_shape().as_list()
         n_in = inputs_shape[-1]
         with tf.variable_scope(scope):
-            weight = create_variable("weight", shape=[n_in, n_out],
+            weight = self.create_variable("weight", shape=[n_in, n_out],
                         initializer=tf.random_normal_initializer(stddev=0.01))
             if use_bias:
-                bias = create_variable("bias", shape=[n_out,],
+                bias = self.create_variable("bias", shape=[n_out,],
                                     initializer=tf.zeros_initializer())
                 return tf.nn.xw_plus_b(inputs, weight, bias)
             return tf.matmul(inputs, weight)
@@ -206,15 +206,15 @@ class FaceAging(object):
 
         with tf.variable_scope(scope):
             # depthwise conv2d
-            dw_conv = depthwise_conv2d(inputs, "depthwise_conv", strides=strides)
+            dw_conv = self.depthwise_conv2d(inputs, "depthwise_conv", strides=strides)
             # batchnorm
-            bn = bacthnorm(dw_conv, "dw_bn", is_training=self.is_training)
+            bn = self.bacthnorm(dw_conv, "dw_bn", is_training=self.is_training)
             # relu
             relu = tf.nn.relu(bn)
             # pointwise conv2d (1x1)
-            pw_conv = conv2d(relu, "pointwise_conv", num_filters)
+            pw_conv = self.conv2d(relu, "pointwise_conv", num_filters)
             # bn
-            bn = bacthnorm(pw_conv, "pw_bn", is_training=self.is_training)
+            bn = self.bacthnorm(pw_conv, "pw_bn", is_training=self.is_training)
             return tf.nn.relu(bn)
 
 
@@ -222,7 +222,7 @@ class FaceAging(object):
         width_multiplier=1
         with tf.variable_scope(scope_name, reuse=reuse) as sc:
             # conv1
-            net = conv2d(x, "conv_1", round(32 * width_multiplier), filter_size=3,
+            net = self.conv2d(x, "conv_1", round(32 * width_multiplier), filter_size=3,
                          strides=2)  # ->[N, 112, 112, 32]
             net = tf.nn.relu(bacthnorm(net, "conv_1/bn", is_training=self.is_training))
             net = self._depthwise_separable_conv2d(net, 64, self.width_multiplier,
@@ -252,16 +252,16 @@ class FaceAging(object):
             net = self._depthwise_separable_conv2d(net, 1024, self.width_multiplier,
                                 "ds_conv_14") # ->[N, 7, 7, 1024]
             self.ds_conv_14 = net
-            net = avg_pool(net, 7, "avg_pool_15")
+            net = self.avg_pool(net, 7, "avg_pool_15")
             net = tf.squeeze(net, [1, 2], name="SpatialSqueeze")
-            self.face_logits = fc(net, self.NUM_CLASSES, "fc_16")
+            self.face_logits = self.fc(net, self.NUM_CLASSES, "fc_16")
             # self.predictions = tf.nn.softmax(self.logits)
 
             if if_age:
                 # age_net = tf.nn.dropout(net, rate = 0.5)
                 # age_net = slim.fully_connected(age_net, 256, activation_fn=tf.nn.relu, scope='age_fc_16')
                 # age_net = tf.nn.dropout(age_net, rate = 0.2)
-                self.age_logits = fc(net, 5, "age_fc_16")
+                self.age_logits = self.fc(net, 5, "age_fc_16")
 
             return sc
 
