@@ -121,80 +121,70 @@ class FaceAging(object):
                 self.age_logits = fc(age_dropout7, 4096, 5, name='age_fc8', relu=False)
 
             return scope
-    def _depthwise_separable_conv(self, inputs,
-                                num_pwc_filters,
-                                sc,
-                                width_multiplier=1,
-                                downsample=False,
-                                fea_extraction=False):
-        """ Helper function to build the depth-wise separable convolution layer.
-        """
-        num_pwc_filters = round(num_pwc_filters * width_multiplier)
-        _stride = 2 if downsample else 1
+    def _depthwise_separable_conv2d(self, inputs, num_filters, width_multiplier,
+                                    scope, downsample=False):
+        """depthwise separable convolution 2D function"""
+        num_filters = round(num_filters * width_multiplier)
+        strides = 2 if downsample else 1
 
-        # skip pointwise by setting num_outputs=None
-        depthwise_conv = slim.separable_convolution2d(inputs,
-                                                    num_outputs=None,
-                                                    stride=_stride,
-                                                    depth_multiplier=1,
-                                                    kernel_size=[3, 3],
-                                                    scope=sc+'/depthwise_conv',
-                                                    activation_fn=None)
-        bn = slim.batch_norm(depthwise_conv, scope=sc+'/dw_batch_norm', activation_fn=tf.nn.relu)
-        pointwise_conv = slim.convolution2d(bn,
-                                            num_pwc_filters,
-                                            kernel_size=[1, 1],
-                                            scope=sc+'/pointwise_conv',
-                                            activation_fn=None)
-        bn = slim.batch_norm(pointwise_conv, scope=sc+'/pw_batch_norm', activation_fn=tf.nn.relu)
-        return bn
+        with tf.variable_scope(scope):
+            # depthwise conv2d
+            dw_conv = depthwise_conv2d(inputs, "depthwise_conv", strides=strides)
+            # batchnorm
+            bn = bacthnorm(dw_conv, "dw_bn", is_training=self.is_training)
+            # relu
+            relu = tf.nn.relu(bn)
+            # pointwise conv2d (1x1)
+            pw_conv = conv2d(relu, "pointwise_conv", num_filters)
+            # bn
+            bn = bacthnorm(pw_conv, "pw_bn", is_training=self.is_training)
+            return tf.nn.relu(bn)
 
 
     def face_age_mobilenet(self, x, scope_name='mobilenet', if_age=False, reuse=False):
         width_multiplier=1
         with tf.variable_scope(scope_name, reuse=reuse) as sc:
-            net = slim.convolution2d(x, round(32 * width_multiplier), [3, 3], stride=2, padding='SAME', scope='conv_1', activation_fn=None)
-            net = slim.batch_norm(net, scope='conv_1/batch_norm', activation_fn=tf.nn.relu)
-            net = self._depthwise_separable_conv(net, 64, 'conv_ds_2')
-            net = self._depthwise_separable_conv(net, 128, 'conv_ds_3', downsample=True)
-            self.conv_ds_3 = net
-            net = self._depthwise_separable_conv(net, 128, 'conv_ds_4')
-            self.conv_ds_4 = net
-            net = self._depthwise_separable_conv(net, 256, 'conv_ds_5', downsample=True)
-            self.conv_ds_5 = net
-            net = self._depthwise_separable_conv(net, 256, 'conv_ds_6')
-            self.conv_ds_6 = net
-            net = self._depthwise_separable_conv(net, 512, 'conv_ds_7', downsample=True)
-            self.conv_ds_7 = net
-
-            net = self._depthwise_separable_conv(net, 512, 'conv_ds_8')
-            self.conv_ds_8 = net
-            net = self._depthwise_separable_conv(net, 512, 'conv_ds_9')
-            self.conv_ds_9 = net
-            net = self._depthwise_separable_conv(net, 512, 'conv_ds_10')
-            self.conv_ds_10 = net
-            net = self._depthwise_separable_conv(net, 512, 'conv_ds_11')
-            self.conv_ds_11 = net
-            net = self._depthwise_separable_conv(net, 512, 'conv_ds_12', fea_extraction=True)
-            self.conv_ds_12 = net
-
-            net = self._depthwise_separable_conv(last_net, 1024, 'conv_ds_13', downsample=True)
-            self.conv_ds_13 = net
-            net = self._depthwise_separable_conv(net, 1024, 'conv_ds_14')
-            self.conv_ds_14 = net
-            net = slim.avg_pool2d(net, [7, 7], scope='avg_pool_15')
-     
-
-            # net = slim.fully_connected(net, 1024, activation_fn=None, scope='fc_16')
-            net = tf.squeeze(net, [1, 2], name='SpatialSqueeze')
-            # net = tf.nn.dropout(net, rate = 0.5)
-            self.face_logits = slim.fully_connected(net, self.NUM_CLASSES, activation_fn=None, scope='fc_16')
+            # conv1
+            net = conv2d(x, "conv_1", round(32 * width_multiplier), filter_size=3,
+                         strides=2)  # ->[N, 112, 112, 32]
+            net = tf.nn.relu(bacthnorm(net, "conv_1/bn", is_training=self.is_training))
+            net = self._depthwise_separable_conv2d(net, 64, self.width_multiplier,
+                                "ds_conv_2") # ->[N, 112, 112, 64]
+            net = self._depthwise_separable_conv2d(net, 128, self.width_multiplier,
+                                "ds_conv_3", downsample=True) # ->[N, 56, 56, 128]
+            net = self._depthwise_separable_conv2d(net, 128, self.width_multiplier,
+                                "ds_conv_4") # ->[N, 56, 56, 128]
+            net = self._depthwise_separable_conv2d(net, 256, self.width_multiplier,
+                                "ds_conv_5", downsample=True) # ->[N, 28, 28, 256]
+            net = self._depthwise_separable_conv2d(net, 256, self.width_multiplier,
+                                "ds_conv_6") # ->[N, 28, 28, 256]
+            net = self._depthwise_separable_conv2d(net, 512, self.width_multiplier,
+                                "ds_conv_7", downsample=True) # ->[N, 14, 14, 512]
+            net = self._depthwise_separable_conv2d(net, 512, self.width_multiplier,
+                                "ds_conv_8") # ->[N, 14, 14, 512]
+            net = self._depthwise_separable_conv2d(net, 512, self.width_multiplier,
+                                "ds_conv_9")  # ->[N, 14, 14, 512]
+            net = self._depthwise_separable_conv2d(net, 512, self.width_multiplier,
+                                "ds_conv_10")  # ->[N, 14, 14, 512]
+            net = self._depthwise_separable_conv2d(net, 512, self.width_multiplier,
+                                "ds_conv_11")  # ->[N, 14, 14, 512]
+            net = self._depthwise_separable_conv2d(net, 512, self.width_multiplier,
+                                "ds_conv_12")  # ->[N, 14, 14, 512]
+            net = self._depthwise_separable_conv2d(net, 1024, self.width_multiplier,
+                                "ds_conv_13", downsample=True) # ->[N, 7, 7, 1024]
+            net = self._depthwise_separable_conv2d(net, 1024, self.width_multiplier,
+                                "ds_conv_14") # ->[N, 7, 7, 1024]
+            self.ds_conv_14 = net
+            net = avg_pool(net, 7, "avg_pool_15")
+            net = tf.squeeze(net, [1, 2], name="SpatialSqueeze")
+            self.face_logits = fc(net, self.NUM_CLASSES, "fc_16")
+            # self.predictions = tf.nn.softmax(self.logits)
 
             if if_age:
-                age_net = tf.nn.dropout(net, rate = 0.5)
-                age_net = slim.fully_connected(age_net, 256, activation_fn=tf.nn.relu, scope='age_fc_16')
-                age_net = tf.nn.dropout(age_net, rate = 0.2)
-                self.age_logits = slim.fully_connected(age_net, 5, activation_fn=None, scope='age_fc_17')
+                # age_net = tf.nn.dropout(net, rate = 0.5)
+                # age_net = slim.fully_connected(age_net, 256, activation_fn=tf.nn.relu, scope='age_fc_16')
+                # age_net = tf.nn.dropout(age_net, rate = 0.2)
+                self.age_logits = fc(net, 5, "age_fc_16")
 
             return sc
 
