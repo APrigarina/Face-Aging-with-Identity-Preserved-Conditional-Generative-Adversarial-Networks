@@ -123,12 +123,12 @@ class FaceAging(object):
             return scope
 
     # create variable
-    def create_variable(name, shape, initializer,
+    def create_variable(self, name, shape, initializer,
         dtype=tf.float32, trainable=True):
         return tf.get_variable(name, shape=shape, dtype=dtype, initializer=initializer, trainable=trainable)
 
     # batchnorm layer
-    def bacthnorm(inputs, scope, epsilon=1e-05, momentum=0.99, is_training=True):
+    def bacthnorm(self, inputs, scope, epsilon=1e-05, momentum=0.99, is_training=True):
         inputs_shape = inputs.get_shape().as_list()
         params_shape = inputs_shape[-1:]
         axis = list(range(len(inputs_shape) - 1))
@@ -150,7 +150,7 @@ class FaceAging(object):
         return tf.nn.batch_normalization(inputs, mean, variance, beta, gamma, epsilon)
 
     # depthwise conv2d layer
-    def depthwise_conv2d(inputs, scope, filter_size=3, channel_multiplier=1, strides=1):
+    def depthwise_conv2d(self, inputs, scope, filter_size=3, channel_multiplier=1, strides=1):
         inputs_shape = inputs.get_shape().as_list()
         in_channels = inputs_shape[-1]
         with tf.variable_scope(scope):
@@ -159,7 +159,7 @@ class FaceAging(object):
         return tf.nn.depthwise_conv2d(inputs, filter, strides=[1, strides, strides, 1], padding="SAME", rate=[1, 1])
 
     # conv2d layer
-    def conv2d(inputs, scope, num_filters, filter_size=1, strides=1):
+    def conv2d(self, inputs, scope, num_filters, filter_size=1, strides=1):
         inputs_shape = inputs.get_shape().as_list()
         in_channels = inputs_shape[-1]
         with tf.variable_scope(scope):
@@ -167,12 +167,12 @@ class FaceAging(object):
         return tf.nn.conv2d(inputs, filter, strides=[1, strides, strides, 1], padding="SAME")
 
     # avg pool layer
-    def avg_pool(inputs, pool_size, scope):
+    def avg_pool(self, inputs, pool_size, scope):
         with tf.variable_scope(scope):
             return tf.nn.avg_pool(inputs, [1, pool_size, pool_size, 1], strides=[1, pool_size, pool_size, 1], padding="VALID")
 
     # fully connected layer
-    def fc(inputs, n_out, scope, use_bias=True):
+    def fc(self, inputs, n_out, scope, use_bias=True):
         inputs_shape = inputs.get_shape().as_list()
         n_in = inputs_shape[-1]
         with tf.variable_scope(scope):
