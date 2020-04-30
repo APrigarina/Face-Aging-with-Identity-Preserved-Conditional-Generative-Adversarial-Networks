@@ -205,7 +205,7 @@ class FaceAging(object):
         with tf.variable_scope(scope_name, reuse=reuse) as sc:
             # conv1
             net = self.conv2d(x, "conv_1", round(32 * width_multiplier), filter_size=3, strides=2)  # ->[N, 112, 112, 32]
-            net = tf.nn.relu(bacthnorm(net, "conv_1/bn", is_training=self.is_training))
+            net = tf.nn.relu(self.bacthnorm(net, "conv_1/bn", is_training=self.is_training))
             net = self._depthwise_separable_conv2d(net, 64, self.width_multiplier, "ds_conv_2") # ->[N, 112, 112, 64]
             net = self._depthwise_separable_conv2d(net, 128, self.width_multiplier, "ds_conv_3", downsample=True) # ->[N, 56, 56, 128]
             net = self._depthwise_separable_conv2d(net, 128, self.width_multiplier, "ds_conv_4") # ->[N, 56, 56, 128]
