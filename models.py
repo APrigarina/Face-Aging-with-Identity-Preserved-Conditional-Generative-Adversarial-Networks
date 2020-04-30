@@ -143,8 +143,8 @@ class FaceAging(object):
             mean, variance = tf.nn.moments(inputs, axes=axis)
             update_move_mean = moving_averages.assign_moving_average(moving_mean, mean, decay=momentum)
             update_move_variance = moving_averages.assign_moving_average(moving_variance, variance, decay=momentum)
-            tf.add_to_collection(UPDATE_OPS_COLLECTION, update_move_mean)
-            tf.add_to_collection(UPDATE_OPS_COLLECTION, update_move_variance)
+            # tf.add_to_collection(UPDATE_OPS_COLLECTION, update_move_mean)
+            # tf.add_to_collection(UPDATE_OPS_COLLECTION, update_move_variance)
         else:
             mean, variance = moving_mean, moving_variance
         return tf.nn.batch_normalization(inputs, mean, variance, beta, gamma, epsilon)
