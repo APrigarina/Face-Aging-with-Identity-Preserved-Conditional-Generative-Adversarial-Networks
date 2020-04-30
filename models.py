@@ -182,7 +182,7 @@ class FaceAging(object):
                 return tf.nn.xw_plus_b(inputs, weight, bias)
             return tf.matmul(inputs, weight)
         
-    def _depthwise_separable_conv2d(self, inputs, num_filters, width_multiplier, scope, downsample=False):
+    def _depthwise_separable_conv2d(self, inputs, num_filters, width_multiplier, scope, downsample=False, is_training=False):
         """depthwise separable convolution 2D function"""
         num_filters = round(num_filters * width_multiplier)
         strides = 2 if downsample else 1
@@ -191,34 +191,34 @@ class FaceAging(object):
             # depthwise conv2d
             dw_conv = self.depthwise_conv2d(inputs, "depthwise_conv", strides=strides)
             # batchnorm
-            bn = self.bacthnorm(dw_conv, "dw_bn", is_training=self.is_training)
+            bn = self.bacthnorm(dw_conv, "dw_bn", is_training=is_training)
             # relu
             relu = tf.nn.relu(bn)
             # pointwise conv2d (1x1)
             pw_conv = self.conv2d(relu, "pointwise_conv", num_filters)
             # bn
-            bn = self.bacthnorm(pw_conv, "pw_bn", is_training=self.is_training)
+            bn = self.bacthnorm(pw_conv, "pw_bn", is_training=is_training)
             return tf.nn.relu(bn)
 
 
-    def face_age_mobilenet(self, x, scope_name='mobilenet', if_age=False, reuse=False, width_multiplier=1):
+    def face_age_mobilenet(self, x, scope_name='mobilenet', if_age=False, reuse=False, width_multiplier=1, is_training=False):
         with tf.variable_scope(scope_name, reuse=reuse) as sc:
             # conv1
             net = self.conv2d(x, "conv_1", round(32 * width_multiplier), filter_size=3, strides=2)  # ->[N, 112, 112, 32]
-            net = tf.nn.relu(self.bacthnorm(net, "conv_1/bn", is_training=self.is_training))
-            net = self._depthwise_separable_conv2d(net, 64, self.width_multiplier, "ds_conv_2") # ->[N, 112, 112, 64]
-            net = self._depthwise_separable_conv2d(net, 128, self.width_multiplier, "ds_conv_3", downsample=True) # ->[N, 56, 56, 128]
-            net = self._depthwise_separable_conv2d(net, 128, self.width_multiplier, "ds_conv_4") # ->[N, 56, 56, 128]
-            net = self._depthwise_separable_conv2d(net, 256, self.width_multiplier, "ds_conv_5", downsample=True) # ->[N, 28, 28, 256]
-            net = self._depthwise_separable_conv2d(net, 256, self.width_multiplier, "ds_conv_6") # ->[N, 28, 28, 256]
-            net = self._depthwise_separable_conv2d(net, 512, self.width_multiplier, "ds_conv_7", downsample=True) # ->[N, 14, 14, 512]
-            net = self._depthwise_separable_conv2d(net, 512, self.width_multiplier, "ds_conv_8") # ->[N, 14, 14, 512]
-            net = self._depthwise_separable_conv2d(net, 512, self.width_multiplier, "ds_conv_9")  # ->[N, 14, 14, 512]
-            net = self._depthwise_separable_conv2d(net, 512, self.width_multiplier, "ds_conv_10")  # ->[N, 14, 14, 512]
-            net = self._depthwise_separable_conv2d(net, 512, self.width_multiplier, "ds_conv_11")  # ->[N, 14, 14, 512]
-            net = self._depthwise_separable_conv2d(net, 512, self.width_multiplier, "ds_conv_12")  # ->[N, 14, 14, 512]
-            net = self._depthwise_separable_conv2d(net, 1024, self.width_multiplier, "ds_conv_13", downsample=True) # ->[N, 7, 7, 1024]
-            net = self._depthwise_separable_conv2d(net, 1024, self.width_multiplier, "ds_conv_14") # ->[N, 7, 7, 1024]
+            net = tf.nn.relu(self.bacthnorm(net, "conv_1/bn", is_training=is_training))
+            net = self._depthwise_separable_conv2d(net, 64, self.width_multiplier, "ds_conv_2", is_training=is_training) # ->[N, 112, 112, 64]
+            net = self._depthwise_separable_conv2d(net, 128, self.width_multiplier, "ds_conv_3", downsample=True, is_training=is_training) # ->[N, 56, 56, 128]
+            net = self._depthwise_separable_conv2d(net, 128, self.width_multiplier, "ds_conv_4", is_training=is_training) # ->[N, 56, 56, 128]
+            net = self._depthwise_separable_conv2d(net, 256, self.width_multiplier, "ds_conv_5", downsample=True, is_training=is_training) # ->[N, 28, 28, 256]
+            net = self._depthwise_separable_conv2d(net, 256, self.width_multiplier, "ds_conv_6", is_training=is_training) # ->[N, 28, 28, 256]
+            net = self._depthwise_separable_conv2d(net, 512, self.width_multiplier, "ds_conv_7", downsample=True, is_training=is_training) # ->[N, 14, 14, 512]
+            net = self._depthwise_separable_conv2d(net, 512, self.width_multiplier, "ds_conv_8", is_training=is_training) # ->[N, 14, 14, 512]
+            net = self._depthwise_separable_conv2d(net, 512, self.width_multiplier, "ds_conv_9", is_training=is_training)  # ->[N, 14, 14, 512]
+            net = self._depthwise_separable_conv2d(net, 512, self.width_multiplier, "ds_conv_10", is_training=is_training)  # ->[N, 14, 14, 512]
+            net = self._depthwise_separable_conv2d(net, 512, self.width_multiplier, "ds_conv_11", is_training=is_training)  # ->[N, 14, 14, 512]
+            net = self._depthwise_separable_conv2d(net, 512, self.width_multiplier, "ds_conv_12", is_training=is_training)  # ->[N, 14, 14, 512]
+            net = self._depthwise_separable_conv2d(net, 1024, self.width_multiplier, "ds_conv_13", downsample=True, is_training=is_training) # ->[N, 7, 7, 1024]
+            net = self._depthwise_separable_conv2d(net, 1024, self.width_multiplier, "ds_conv_14", is_training=is_training) # ->[N, 7, 7, 1024]
             self.ds_conv_14 = net
             net = self.avg_pool(net, 7, "avg_pool_15")
             net = tf.squeeze(net, [1, 2], name="SpatialSqueeze")
@@ -301,7 +301,7 @@ class FaceAging(object):
         :return:
         """
         print("imgs", imgs)
-        self.face_age_mobilenet(source_img_227, if_age=True)
+        self.face_age_mobilenet(source_img_227, if_age=True, is_training=True)
         if fea_layer_name == 'ds_conv':
             source_fea = self.ds_conv 
         if fea_layer_name == 'conv_ds_12':
