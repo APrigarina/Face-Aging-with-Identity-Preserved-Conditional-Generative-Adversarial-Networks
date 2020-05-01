@@ -301,7 +301,7 @@ class FaceAging(object):
         :return:
         """
         print("imgs", imgs)
-        self.face_age_mobilenet(source_img_227, if_age=True, is_training=True)
+        self.face_age_mobilenet(source_img_227, if_age=True, is_training=False)
         if fea_layer_name == 'ds_conv':
             source_fea = self.ds_conv 
         if fea_layer_name == 'conv_ds_12':
@@ -353,7 +353,7 @@ class FaceAging(object):
         g_source = g_source - self.mean
         print("Okay 4")
 
-        self.face_age_mobilenet(g_source, if_age=True, reuse=True)
+        self.face_age_mobilenet(g_source, if_age=True, reuse=True, is_training=True)
         print("Okay 5")
         self.age_loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
                                                 logits=self.age_logits, labels=age_label)) * self.age_loss_weight
