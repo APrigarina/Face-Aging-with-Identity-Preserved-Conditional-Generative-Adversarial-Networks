@@ -7,7 +7,7 @@ import sys
 sys.path.append('./tools/')
 from ops import *
 import tensorflow.contrib.slim as slim
-
+UPDATE_OPS_COLLECTION = "_update_ops_"
 class FaceAging(object):
     def __init__(self, sess, lr, keep_prob, model_num, batch_size=64, decay_steps=None,
                  gan_loss_weight=None, fea_loss_weight=None, age_loss_weight=None,
@@ -143,8 +143,8 @@ class FaceAging(object):
             mean, variance = tf.nn.moments(inputs, axes=axis)
             update_move_mean = moving_averages.assign_moving_average(moving_mean, mean, decay=momentum)
             update_move_variance = moving_averages.assign_moving_average(moving_variance, variance, decay=momentum)
-            # tf.add_to_collection(UPDATE_OPS_COLLECTION, update_move_mean)
-            # tf.add_to_collection(UPDATE_OPS_COLLECTION, update_move_variance)
+            tf.add_to_collection(UPDATE_OPS_COLLECTION, update_move_mean)
+            tf.add_to_collection(UPDATE_OPS_COLLECTION, update_move_variance)
         else:
             mean, variance = moving_mean, moving_variance
         return tf.nn.batch_normalization(inputs, mean, variance, beta, gamma, epsilon)
@@ -301,7 +301,7 @@ class FaceAging(object):
         :return:
         """
         print("imgs", imgs)
-        self.face_age_mobilenet(source_img_227, if_age=True, is_training=False)
+        self.face_age_mobilenet(source_img_227, if_age=True, is_training=True)
         if fea_layer_name == 'ds_conv':
             source_fea = self.ds_conv 
         if fea_layer_name == 'conv_ds_12':
@@ -353,7 +353,7 @@ class FaceAging(object):
         g_source = g_source - self.mean
         print("Okay 4")
 
-        self.face_age_mobilenet(g_source, if_age=True, reuse=True, is_training=True)
+        self.face_age_mobilenet(g_source, if_age=True, reuse=True, is_training=False)
         print("Okay 5")
         self.age_loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
                                                 logits=self.age_logits, labels=age_label)) * self.age_loss_weight
