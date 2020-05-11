@@ -70,7 +70,7 @@ def my_train():
 
         model.ge_samples = model.generate_images(model.imgs, model.true_label_features_128, stable_bn=False, mode='train')
 
-        model.get_vars()
+        model.get_vars_mobilenet()
 
         # Create a saver.
         model.saver = tf.train.Saver(model.save_g_vars)

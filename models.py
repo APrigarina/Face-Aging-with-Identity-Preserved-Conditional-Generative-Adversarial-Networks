@@ -33,94 +33,94 @@ class FaceAging(object):
         self.tv_loss_weight = tv_loss_weight
         self.weight_decay_rate = 0.0005
 
-    def inference(self, x, scope_name='alexnet', reuse=False):
-        with tf.variable_scope(scope_name, reuse=reuse) as scope:
-            print("inference", x)
-            # 1st Layer: Conv (w ReLu) -> Pool -> Lrn
-            conv1 = conv(x, 11, 11, 96, 4, 4, padding='VALID', name='conv1')
-            pool1 = max_pool(conv1, 3, 3, 2, 2, padding='VALID', name='pool1')
-            norm1 = lrn(pool1, 2, 2e-05, 0.75, name='norm1')
+    # def inference(self, x, scope_name='alexnet', reuse=False):
+    #     with tf.variable_scope(scope_name, reuse=reuse) as scope:
+    #         print("inference", x)
+    #         # 1st Layer: Conv (w ReLu) -> Pool -> Lrn
+    #         conv1 = conv(x, 11, 11, 96, 4, 4, padding='VALID', name='conv1')
+    #         pool1 = max_pool(conv1, 3, 3, 2, 2, padding='VALID', name='pool1')
+    #         norm1 = lrn(pool1, 2, 2e-05, 0.75, name='norm1')
 
-            # 2nd Layer: Conv (w ReLu) -> Pool -> Lrn with 2 groups
-            conv2 = conv(norm1, 5, 5, 256, 1, 1, groups=2, name='conv2')
-            pool2 = max_pool(conv2, 3, 3, 2, 2, padding='VALID', name='pool2')
-            norm2 = lrn(pool2, 2, 2e-05, 0.75, name='norm2')
+    #         # 2nd Layer: Conv (w ReLu) -> Pool -> Lrn with 2 groups
+    #         conv2 = conv(norm1, 5, 5, 256, 1, 1, groups=2, name='conv2')
+    #         pool2 = max_pool(conv2, 3, 3, 2, 2, padding='VALID', name='pool2')
+    #         norm2 = lrn(pool2, 2, 2e-05, 0.75, name='norm2')
 
-            # 3rd Layer: Conv (w ReLu)
-            conv3 = conv(norm2, 3, 3, 384, 1, 1, name='conv3')
+    #         # 3rd Layer: Conv (w ReLu)
+    #         conv3 = conv(norm2, 3, 3, 384, 1, 1, name='conv3')
 
-            # 4th Layer: Conv (w ReLu) splitted into two groups
-            conv4 = conv(conv3, 3, 3, 384, 1, 1, groups=2, name='conv4')
+    #         # 4th Layer: Conv (w ReLu) splitted into two groups
+    #         conv4 = conv(conv3, 3, 3, 384, 1, 1, groups=2, name='conv4')
 
-            # 5th Layer: Conv (w ReLu) -> Pool splitted into two groups
-            conv5 = conv(conv4, 3, 3, 256, 1, 1, groups=2, name='conv5')
-            pool5 = max_pool(conv5, 3, 3, 2, 2, padding='VALID', name='pool5')
+    #         # 5th Layer: Conv (w ReLu) -> Pool splitted into two groups
+    #         conv5 = conv(conv4, 3, 3, 256, 1, 1, groups=2, name='conv5')
+    #         pool5 = max_pool(conv5, 3, 3, 2, 2, padding='VALID', name='pool5')
 
-            # 6th Layer: Flatten -> FC (w ReLu) -> Dropout
-            flattened = tf.reshape(pool5, [-1, 6 * 6 * 256])
-            fc6 = fc(flattened, 6 * 6 * 256, 4096, name='fc6')
-            dropout6 = dropout(fc6, self.KEEP_PROB)
+    #         # 6th Layer: Flatten -> FC (w ReLu) -> Dropout
+    #         flattened = tf.reshape(pool5, [-1, 6 * 6 * 256])
+    #         fc6 = fc(flattened, 6 * 6 * 256, 4096, name='fc6')
+    #         dropout6 = dropout(fc6, self.KEEP_PROB)
 
-            # 7th Layer: FC (w ReLu) -> Dropout
-            fc7 = fc(dropout6, 4096, 4096, name='fc7')
-            dropout7 = dropout(fc7, self.KEEP_PROB)
-            # 8th Layer: FC and return unscaled activations (for tf.nn.softmax_cross_entropy_with_logits)
-            self.fc8 = fc(dropout7, 4096, self.NUM_CLASSES, relu=False, name='fc8')
+    #         # 7th Layer: FC (w ReLu) -> Dropout
+    #         fc7 = fc(dropout6, 4096, 4096, name='fc7')
+    #         dropout7 = dropout(fc7, self.KEEP_PROB)
+    #         # 8th Layer: FC and return unscaled activations (for tf.nn.softmax_cross_entropy_with_logits)
+    #         self.fc8 = fc(dropout7, 4096, self.NUM_CLASSES, relu=False, name='fc8')
 
-            return scope
+    #         return scope
 
-    def face_age_alexnet(self, x, scope_name='alexnet', if_age=False, reuse=False):
-        with tf.variable_scope(scope_name, reuse=reuse) as scope:
-            print("face_age_alexnet", x)
-            # 1st Layer: Conv (w ReLu) -> Pool -> Lrn
-            conv1 = conv(x, 11, 11, 96, 4, 4, padding='VALID', name='conv1')
-            pool1 = max_pool(conv1, 3, 3, 2, 2, padding='VALID', name='pool1')
-            norm1 = lrn(pool1, 2, 2e-05, 0.75, name='norm1')
+    # def face_age_alexnet(self, x, scope_name='alexnet', if_age=False, reuse=False):
+    #     with tf.variable_scope(scope_name, reuse=reuse) as scope:
+    #         print("face_age_alexnet", x)
+    #         # 1st Layer: Conv (w ReLu) -> Pool -> Lrn
+    #         conv1 = conv(x, 11, 11, 96, 4, 4, padding='VALID', name='conv1')
+    #         pool1 = max_pool(conv1, 3, 3, 2, 2, padding='VALID', name='pool1')
+    #         norm1 = lrn(pool1, 2, 2e-05, 0.75, name='norm1')
 
-            # 2nd Layer: Conv (w ReLu) -> Pool -> Lrn with 2 groups
-            conv2 = conv(norm1, 5, 5, 256, 1, 1, groups=2, name='conv2')
-            pool2 = max_pool(conv2, 3, 3, 2, 2, padding='VALID', name='pool2')
-            norm2 = lrn(pool2, 2, 2e-05, 0.75, name='norm2')
+    #         # 2nd Layer: Conv (w ReLu) -> Pool -> Lrn with 2 groups
+    #         conv2 = conv(norm1, 5, 5, 256, 1, 1, groups=2, name='conv2')
+    #         pool2 = max_pool(conv2, 3, 3, 2, 2, padding='VALID', name='pool2')
+    #         norm2 = lrn(pool2, 2, 2e-05, 0.75, name='norm2')
 
-            # 3rd Layer: Conv (w ReLu)
-            conv3 = conv(norm2, 3, 3, 384, 1, 1, name='conv3')
-            self.conv3 = conv3
-            # 4th Layer: Conv (w ReLu) splitted into two groups
-            conv4 = conv(conv3, 3, 3, 384, 1, 1, groups=2, name='conv4')
-            self.conv4 = conv4
+    #         # 3rd Layer: Conv (w ReLu)
+    #         conv3 = conv(norm2, 3, 3, 384, 1, 1, name='conv3')
+    #         self.conv3 = conv3
+    #         # 4th Layer: Conv (w ReLu) splitted into two groups
+    #         conv4 = conv(conv3, 3, 3, 384, 1, 1, groups=2, name='conv4')
+    #         self.conv4 = conv4
 
-            # 5th Layer: Conv (w ReLu) -> Pool splitted into two groups
-            conv5 = conv(conv4, 3, 3, 256, 1, 1, groups=2, name='conv5')
-            self.conv5 = conv5
+    #         # 5th Layer: Conv (w ReLu) -> Pool splitted into two groups
+    #         conv5 = conv(conv4, 3, 3, 256, 1, 1, groups=2, name='conv5')
+    #         self.conv5 = conv5
 
-            pool5 = max_pool(conv5, 3, 3, 2, 2, padding='VALID', name='pool5')
-            self.pool5 = pool5
+    #         pool5 = max_pool(conv5, 3, 3, 2, 2, padding='VALID', name='pool5')
+    #         self.pool5 = pool5
 
-            # 6th Layer: Flatten -> FC (w ReLu) -> Dropout
-            flattened = tf.reshape(pool5, [-1, 6 * 6 * 256])
-            fc6 = fc(flattened, 6 * 6 * 256, 4096, name='fc6')
-            self.fc6 = fc6
-            dropout6 = dropout(fc6, self.KEEP_PROB)
+    #         # 6th Layer: Flatten -> FC (w ReLu) -> Dropout
+    #         flattened = tf.reshape(pool5, [-1, 6 * 6 * 256])
+    #         fc6 = fc(flattened, 6 * 6 * 256, 4096, name='fc6')
+    #         self.fc6 = fc6
+    #         dropout6 = dropout(fc6, self.KEEP_PROB)
 
-            # 7th Layer: FC (w ReLu) -> Dropout
-            fc7 = fc(dropout6, 4096, 4096, name='fc7')
-            self.fc7 = fc7
-            dropout7 = dropout(fc7, self.KEEP_PROB)
+    #         # 7th Layer: FC (w ReLu) -> Dropout
+    #         fc7 = fc(dropout6, 4096, 4096, name='fc7')
+    #         self.fc7 = fc7
+    #         dropout7 = dropout(fc7, self.KEEP_PROB)
 
-            face_fc9 = fc(dropout7, 4096, 256, name='new_1')
-            self.fc9 = face_fc9
-            # 8th Layer: FC and return unscaled activations (for tf.nn.softmax_cross_entropy_with_logits)
-            self.face_logits = fc(face_fc9, 256, self.NUM_CLASSES, relu=False, name='new_2')
+    #         face_fc9 = fc(dropout7, 4096, 256, name='new_1')
+    #         self.fc9 = face_fc9
+    #         # 8th Layer: FC and return unscaled activations (for tf.nn.softmax_cross_entropy_with_logits)
+    #         self.face_logits = fc(face_fc9, 256, self.NUM_CLASSES, relu=False, name='new_2')
 
-            if if_age:
-                age_fc6 = fc(flattened, 6 * 6 * 256, 4096, name='age_fc6')
-                age_dropout6 = dropout(age_fc6, self.KEEP_PROB)
-                # 7th Layer: FC (w ReLu) -> Dropout
-                age_fc7 = fc(age_dropout6, 4096, 4096, name='age_fc7')
-                age_dropout7 = dropout(age_fc7, self.KEEP_PROB)
-                self.age_logits = fc(age_dropout7, 4096, 5, name='age_fc8', relu=False)
+    #         if if_age:
+    #             age_fc6 = fc(flattened, 6 * 6 * 256, 4096, name='age_fc6')
+    #             age_dropout6 = dropout(age_fc6, self.KEEP_PROB)
+    #             # 7th Layer: FC (w ReLu) -> Dropout
+    #             age_fc7 = fc(age_dropout6, 4096, 4096, name='age_fc7')
+    #             age_dropout7 = dropout(age_fc7, self.KEEP_PROB)
+    #             self.age_logits = fc(age_dropout7, 4096, 5, name='age_fc8', relu=False)
 
-            return scope
+    #         return scope
 
     # create variable
     def create_variable(self, name, shape, initializer,
@@ -353,7 +353,7 @@ class FaceAging(object):
         g_source = g_source - self.mean
         print("Okay 4")
 
-        self.face_age_mobilenet(g_source, if_age=True, reuse=True, is_training=False)
+        self.face_age_mobilenet(g_source, if_age=True, reuse=True, is_training=True)
         print("Okay 5")
         self.age_loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
                                                 logits=self.age_logits, labels=age_label)) * self.age_loss_weight
