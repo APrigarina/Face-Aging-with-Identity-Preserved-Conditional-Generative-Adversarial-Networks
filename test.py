@@ -34,10 +34,10 @@ flags.DEFINE_float("age_loss_weight", None, "age_loss_weight")
 
 flags.DEFINE_float("tv_loss_weight", None, "face_loss_weight")
 
-flags.DEFINE_string("checkpoint_dir", './checkpoints/0_conv5_lsgan_transfer_g75_0.5f-4_a30/',
+flags.DEFINE_string("checkpoint_dir", '/content/drive/My Drive/Diploma/final_checkpoints/mobilenet',
                     "Directory name to save the checkpoints")
 
-flags.DEFINE_string("save_dir", 'age/0_conv5_lsgan_transfer_g75_0.5f-4_a30/',
+flags.DEFINE_string("save_dir", '/content/drive/My Drive/Diploma/test_results/mobilenet',
                     "Directory name to save the sample images")
 
 flags.DEFINE_string("test_data_dir", './images/test/', "test images")
@@ -78,7 +78,7 @@ def my_train():
         # Start running operations on the Graph.
         sess.run(tf.global_variables_initializer())
 
-        if model.load(FLAGS.checkpoint_dir, model.saver, 'acgan', 399999):
+        if model.load(FLAGS.checkpoint_dir, model.saver, 'mobilenet_acgan', 24999):
             print(" [*] Load SUCCESS")
         else:
             print(" [!] Load failed...")
