@@ -222,14 +222,12 @@ class FaceAging(object):
             self.conv_ds_14 = net
             net = self.avg_pool(net, 7, "avg_pool_15")
             net = tf.squeeze(net, [1, 2], name="SpatialSqueeze")
-            self.face_logits = self.fc(net, self.NUM_CLASSES, "fc_16")
-            # self.predictions = tf.nn.softmax(self.logits)
 
-            if if_age:
-                # age_net = tf.nn.dropout(net, rate = 0.5)
-                # age_net = slim.fully_connected(age_net, 256, activation_fn=tf.nn.relu, scope='age_fc_16')
-                # age_net = tf.nn.dropout(age_net, rate = 0.2)
-                self.age_logits = self.fc(net, 5, "age_fc_16")
+            net = tf.nn.dropout(net, rate = 0.5, name='do_16')
+            net = self.fc(net, 256, scope='fc_17')
+            net = tf.nn.relu(features, name='relu_17')
+            net = tf.nn.dropout(net, rate = 0.2, name='do_18')
+            self.age_logits = self.fc(net, 5, "fc_19")
 
             return sc
 
@@ -399,6 +397,20 @@ class FaceAging(object):
         self.g_optim = tf.group(*train_ops)
         print("Okay 10")
 
+    def train_mobilenet(self, source_img_227, source_img_128, imgs, true_label_fea_128, true_label_fea_64,
+                        false_label_fea_64, fea_layer_name, age_label):
+
+        self.face_age_mobilenet(source_img_227, is_training=True)
+
+        self.age_loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
+                                                logits=self.age_logits, labels=age_label)) * self.age_loss_weight
+
+        self.get_vars_mobilenet()
+
+        m_optim = tf.train.AdamOptimizer(self.learning_rate, beta1=0.5).minimize(self.age_loss,
+                                                                                 var_list=self.mobilenet_vars)
+        train_ops = [m_optim] + self._extra_train_ops
+        self.m_optim = tf.group(*train_ops)
 
     def generate_images(self, source_img_128, true_label_fea, stable_bn=False, reuse=False, mode='test'):
 
@@ -510,18 +522,7 @@ class FaceAging(object):
 
         t_vars = tf.global_variables()
 
-        mobilenet_vars = [var for var in t_vars if 'mobilenet' in var.name]
-        self.mobilenet_vars = [var for var in mobilenet_vars if 'age' not in var.name]
-        self.age_vars = [var for var in t_vars if 'age' in var.name]
-
-        self.save_d_vars = [var for var in t_vars if 'discriminator' in var.name]
-        self.save_g_vars = [var for var in t_vars if 'generator' in var.name]
-        for var in self.save_g_vars:
-            print(var.name)
-
-        t_vars = tf.trainable_variables()
-        self.d_vars = [var for var in t_vars if 'discriminator' in var.name]
-        self.g_vars = [var for var in t_vars if 'generator' in var.name]
+        self.mobilenet_vars = [var for var in t_vars if 'mobilenet' in var.name]
     
     def save(self, checkpoint_dir, step, prefix):
         model_name = prefix + '.model'
