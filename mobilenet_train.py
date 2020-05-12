@@ -64,7 +64,7 @@ FLAGS = flags.FLAGS
 VAL_INTERVAL = 100
 
 # How often to save a model checkpoint
-SAVE_INTERVAL = 10000
+SAVE_INTERVAL = 5000
 
 d_iter = 1
 g_iter = 1
@@ -135,9 +135,9 @@ def my_train():
         for step in range(FLAGS.max_steps):
 
             if step % 15 == 0:
-                model.learning_rate = lr * math.exp(-0.1)
+                model.learning_rate = model.learning_rate * math.exp(-0.1)
 
-            images, t_label_features_128, age_labels = \
+            images, t_label_features_128,  t_label_features_128, t_label_features_64, f_label_features_64, age_labels = \
                 train_generator.next_target_batch_transfer2()
             
             # print("images shape", images.shape)
