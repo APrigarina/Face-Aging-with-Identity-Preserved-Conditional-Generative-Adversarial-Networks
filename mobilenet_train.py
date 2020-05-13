@@ -11,7 +11,7 @@ sys.path.append('./tools/')
 from source_input import load_source_batch3
 from utils import save_images, save_source
 from data_generator import ImageDataGenerator
-
+import math
 
     
 
@@ -83,22 +83,21 @@ def my_train():
                         fea_loss_weight=FLAGS.fea_loss_weight, tv_loss_weight=FLAGS.tv_loss_weight)
 
         imgs = tf.placeholder(tf.float32, [FLAGS.batch_size, FLAGS.image_size, FLAGS.image_size, 3])
-        true_label_features_128 = tf.placeholder(tf.float32, [FLAGS.batch_size, 128, 128, FLAGS.age_groups])
-        true_label_features_64 = tf.placeholder(tf.float32, [FLAGS.batch_size, 64, 64, FLAGS.age_groups])
-        false_label_features_64 = tf.placeholder(tf.float32, [FLAGS.batch_size, 64, 64, FLAGS.age_groups])
+        # true_label_features_128 = tf.placeholder(tf.float32, [FLAGS.batch_size, 128, 128, FLAGS.age_groups])
+        # true_label_features_64 = tf.placeholder(tf.float32, [FLAGS.batch_size, 64, 64, FLAGS.age_groups])
+        # false_label_features_64 = tf.placeholder(tf.float32, [FLAGS.batch_size, 64, 64, FLAGS.age_groups])
         age_label = tf.placeholder(tf.int32, [FLAGS.batch_size])
 
         print('Shapes')
         print('imgs', imgs)
-        print('true_label_features_128', true_label_features_128)
-        print('true_label_features_64', true_label_features_64)
-        print('false_label_features_64', false_label_features_64)
+        # print('true_label_features_128', true_label_features_128)
+        # print('true_label_features_64', true_label_features_64)
+        # print('false_label_features_64', false_label_features_64)
         print('age_label', age_label)
 
-        source_img_227, source_img_128, face_label = load_source_batch3(FLAGS.source_file, FLAGS.root_folder, FLAGS.batch_size)
+        source_img_227, _, _ = load_source_batch3(FLAGS.source_file, FLAGS.root_folder, FLAGS.batch_size)
         print("after load source batch3")
-        model.train_mobilenet(source_img_227, source_img_128, imgs, true_label_features_128,
-                                       true_label_features_64, false_label_features_64, FLAGS.fea_layer_name, age_label)
+        model.train_mobilenet(source_img_227, age_label)
 
         # Create a saver.
         model.mobilenet_saver = tf.train.Saver(model.mobilenet_vars)
@@ -137,16 +136,14 @@ def my_train():
             if step % 15 == 0:
                 model.learning_rate = model.learning_rate * math.exp(-0.1)
 
-            images, t_label_features_128,  t_label_features_128, t_label_features_64, f_label_features_64, age_labels = \
+            images, _,  _, _, _, age_labels = \
                 train_generator.next_target_batch_transfer2()
             
             # print("images shape", images.shape)
             dict = {imgs: images,
-                    true_label_features_128: t_label_features_128,
                     age_label: age_labels
                     }
-
-            
+                    
             age_loss = sess.run([model.m_optim, age_error], feed_dict=dict)
 
             format_str = ('%s: step %d, age_loss=%.3f')

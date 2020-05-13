@@ -225,7 +225,7 @@ class FaceAging(object):
 
             net = tf.nn.dropout(net, rate = 0.5, name='do_16')
             net = self.fc(net, 256, scope='fc_17')
-            net = tf.nn.relu(features, name='relu_17')
+            net = tf.nn.relu(net, name='relu_17')
             net = tf.nn.dropout(net, rate = 0.2, name='do_18')
             self.age_logits = self.fc(net, 5, "fc_19")
 
@@ -397,8 +397,7 @@ class FaceAging(object):
         self.g_optim = tf.group(*train_ops)
         print("Okay 10")
 
-    def train_mobilenet(self, source_img_227, source_img_128, imgs, true_label_fea_128, true_label_fea_64,
-                        false_label_fea_64, fea_layer_name, age_label):
+    def train_mobilenet(self, source_img_227, age_label):
 
         self.face_age_mobilenet(source_img_227, is_training=True)
 
@@ -407,10 +406,10 @@ class FaceAging(object):
 
         self.get_vars_mobilenet()
 
-        m_optim = tf.train.AdamOptimizer(self.learning_rate, beta1=0.5).minimize(self.age_loss,
+        self.m_optim = tf.train.AdamOptimizer(self.learning_rate, beta1=0.5).minimize(self.age_loss,
                                                                                  var_list=self.mobilenet_vars)
-        train_ops = [m_optim] + self._extra_train_ops
-        self.m_optim = tf.group(*train_ops)
+        # train_ops = [m_optim] + self._extra_train_ops
+        # self.m_optim = tf.group(*train_ops)
 
     def generate_images(self, source_img_128, true_label_fea, stable_bn=False, reuse=False, mode='test'):
 
