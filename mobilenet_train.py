@@ -85,9 +85,9 @@ def my_train():
         # imgs = tf.placeholder(tf.float32, [FLAGS.batch_size, FLAGS.image_size, FLAGS.image_size, 3])
         # age_label = tf.placeholder(tf.int32, [FLAGS.batch_size])
 
-        print('Shapes')
-        print('imgs', imgs)
-        print('age_label', age_label)
+        # print('Shapes')
+        # print('imgs', imgs)
+        # print('age_label', age_label)
 
         source_img_227, _, age_label = load_source_batch3(FLAGS.source_file, FLAGS.root_folder, FLAGS.batch_size)
         print("after load source batch3")
@@ -130,8 +130,8 @@ def my_train():
             if step % 15 == 0:
                 model.learning_rate = model.learning_rate * math.exp(-0.1)
 
-            images, _, _, _, age_labels = \
-                train_generator.next_target_batch_transfer2()
+            # images, _, _, _, age_labels = \
+            #     train_generator.next_target_batch_transfer2()
             
             # print("images shape", images.shape)
 
