@@ -82,20 +82,14 @@ def my_train():
                         age_loss_weight=FLAGS.age_loss_weight, gan_loss_weight=FLAGS.gan_loss_weight,
                         fea_loss_weight=FLAGS.fea_loss_weight, tv_loss_weight=FLAGS.tv_loss_weight)
 
-        imgs = tf.placeholder(tf.float32, [FLAGS.batch_size, FLAGS.image_size, FLAGS.image_size, 3])
-        # true_label_features_128 = tf.placeholder(tf.float32, [FLAGS.batch_size, 128, 128, FLAGS.age_groups])
-        # true_label_features_64 = tf.placeholder(tf.float32, [FLAGS.batch_size, 64, 64, FLAGS.age_groups])
-        # false_label_features_64 = tf.placeholder(tf.float32, [FLAGS.batch_size, 64, 64, FLAGS.age_groups])
-        age_label = tf.placeholder(tf.int32, [FLAGS.batch_size])
+        # imgs = tf.placeholder(tf.float32, [FLAGS.batch_size, FLAGS.image_size, FLAGS.image_size, 3])
+        # age_label = tf.placeholder(tf.int32, [FLAGS.batch_size])
 
         print('Shapes')
         print('imgs', imgs)
-        # print('true_label_features_128', true_label_features_128)
-        # print('true_label_features_64', true_label_features_64)
-        # print('false_label_features_64', false_label_features_64)
         print('age_label', age_label)
 
-        source_img_227, _, _ = load_source_batch3(FLAGS.source_file, FLAGS.root_folder, FLAGS.batch_size)
+        source_img_227, _, age_label = load_source_batch3(FLAGS.source_file, FLAGS.root_folder, FLAGS.batch_size)
         print("after load source batch3")
         model.train_mobilenet(source_img_227, age_label)
 
@@ -103,7 +97,7 @@ def my_train():
         model.mobilenet_saver = tf.train.Saver(model.mobilenet_vars)
         print("Model mobilenet", model.mobilenet_vars)
 
-        age_error = model.age_loss/model.age_loss_weight
+        age_error = model.age_loss
 
         # Start running operations on the Graph.
         sess.run(tf.global_variables_initializer())
@@ -140,10 +134,8 @@ def my_train():
                 train_generator.next_target_batch_transfer2()
             
             # print("images shape", images.shape)
-            dict = {imgs: images,
-                    age_label: age_labels
-                    }
-            age_loss = sess.run([model.m_optim, age_error], feed_dict=dict)
+
+            age_loss = sess.run([model.m_optim, age_error])
 
             format_str = ('%s: step %d, age_loss=%.3f')
             if step % 10 == 0: 
