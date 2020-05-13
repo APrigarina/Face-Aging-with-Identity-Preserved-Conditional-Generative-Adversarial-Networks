@@ -136,14 +136,13 @@ def my_train():
             if step % 15 == 0:
                 model.learning_rate = model.learning_rate * math.exp(-0.1)
 
-            images, _,  _, _, _, age_labels = \
+            images, _, _, _, age_labels = \
                 train_generator.next_target_batch_transfer2()
             
             # print("images shape", images.shape)
             dict = {imgs: images,
                     age_label: age_labels
                     }
-                    
             age_loss = sess.run([model.m_optim, age_error], feed_dict=dict)
 
             format_str = ('%s: step %d, age_loss=%.3f')
