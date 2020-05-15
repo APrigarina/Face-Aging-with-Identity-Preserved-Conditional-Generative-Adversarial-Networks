@@ -402,7 +402,7 @@ class FaceAging(object):
         self.face_age_mobilenet(source_img_227, is_training=True)
 
         self.age_loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
-                                                logits=self.age_logits, labels=age_label)) * self.age_loss_weight
+                                                logits=self.age_logits, labels=age_label))
 
         self.get_vars_mobilenet()
 

@@ -82,19 +82,12 @@ def my_train():
                         age_loss_weight=FLAGS.age_loss_weight, gan_loss_weight=FLAGS.gan_loss_weight,
                         fea_loss_weight=FLAGS.fea_loss_weight, tv_loss_weight=FLAGS.tv_loss_weight)
 
-        # imgs = tf.placeholder(tf.float32, [FLAGS.batch_size, FLAGS.image_size, FLAGS.image_size, 3])
-        # age_label = tf.placeholder(tf.int32, [FLAGS.batch_size])
-
-        # print('Shapes')
-        # print('imgs', imgs)
-        # print('age_label', age_label)
-
         source_img_227, _, age_label = load_source_batch3(FLAGS.source_file, FLAGS.root_folder, FLAGS.batch_size)
         print("after load source batch3")
         model.train_mobilenet(source_img_227, age_label)
 
         # Create a saver.
-        model.mobilenet_saver = tf.train.Saver(model.mobilenet_vars)
+        model.saver = tf.train.Saver(model.mobilenet_vars)
         print("Model mobilenet", model.mobilenet_vars)
 
         age_error = model.age_loss
@@ -105,37 +98,21 @@ def my_train():
         tf.train.start_queue_runners(sess)
         print("after start_queue_runners")
 
-        # print("age_lsgan before restore ",FLAGS.checkpoint_dir, model.saver )
-        
-        # print("alexnet_saver before restore ",FLAGS.alexnet_pretrained_model )
-        # model.alexnet_saver.restore(sess, FLAGS.alexnet_pretrained_model)
-        # print("age_saver before restore ",FLAGS.age_pretrained_model )
-        # model.age_saver.restore(sess, FLAGS.age_pretrained_model)
-        #FLAGS.checkpoint_dir, model.saver, 'acgan', 399999
-        # print("==========load===========")
-        # print("BEFORE")
-        # for v in tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES):
-        #   print(v)
-        # v1 = tf.get_variable('alexnet/conv5/weights', shape=[4])
-        # if model.load(FLAGS.checkpoint_dir, model.saver, 'acgan', 399999):
-        #     print(" [*] Load SUCCESS")
-        # else:
-        #     print(" [!] Load failed...")
+        steps_made = 13999
+        if model.load(FLAGS.checkpoint_dir, model.saver, 'mobilenet', steps_made):
+            print(" [*] Load SUCCESS")
+        else:
+            print(" [!] Load failed...")
 
         print("{} Start training...")
 
         # Loop over max_steps
-        for step in range(FLAGS.max_steps):
+        for step in range(steps_made+1, FLAGS.max_steps):
 
             if step % 15 == 0:
                 model.learning_rate = model.learning_rate * math.exp(-0.1)
 
-            # images, _, _, _, age_labels = \
-            #     train_generator.next_target_batch_transfer2()
-            
-            # print("images shape", images.shape)
-
-            age_loss = sess.run([model.m_optim, age_error])
+            _, age_loss = sess.run([model.m_optim, age_error])
 
             format_str = ('%s: step %d, age_loss=%.3f')
             if step % 10 == 0: 
@@ -146,24 +123,6 @@ def my_train():
                 checkpoint_path = os.path.join(FLAGS.checkpoint_dir)
                 model.save(checkpoint_path, step, 'mobilenet')
 
-            # if step % VAL_INTERVAL == VAL_INTERVAL-1:
-            #     if not os.path.exists(FLAGS.sample_dir):
-            #         os.makedirs(FLAGS.sample_dir)
-            #     path = os.path.join(FLAGS.sample_dir, str(step))
-            #     if not os.path.exists(path):
-            #         os.makedirs(path)
-
-            #     source = sess.run(source_img_128)
-            #     save_source(source, [4, 8], os.path.join(path, 'source.jpg'))
-            #     for j in range(train_generator.n_classes):
-            #         true_label_fea = train_generator.label_features_128[j]
-            #         dict = {
-            #                 imgs: source,
-            #                 true_label_features_128: true_label_fea
-            #                 }
-            #         samples = sess.run(ge_samples, feed_dict=dict)
-            #         save_images(samples, [4, 8], '{}/test_{:01d}.jpg'.format(path, j))
-            #         print("===========> img saved to", '{}/test_{:01d}.jpg'.format(path, j))
 
 def main(argv=None):
     my_train()
