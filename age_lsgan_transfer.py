@@ -32,7 +32,8 @@ flags.DEFINE_integer('max_steps', 200000, 'Number of batches to run')
 
 flags.DEFINE_string("alexnet_pretrained_model", "/content/drive/My Drive/Diploma/alexnet/alexnet.model-292000",
                     "Directory name to save the checkpoints")
-
+flags.DEFINE_string("mobilenet_pretrained_model", "/content/drive/My Drive/Diploma/mobilenet_train_checkpoints/mobilenet.model-169999",
+                    "Directory name to save the checkpoints")
 flags.DEFINE_string("age_pretrained_model", "/content/drive/My Drive/Diploma/age_classifier/age_classifier.model-300000",
                     "Directory name to save the checkpoints")
 
@@ -107,9 +108,9 @@ def my_train():
         model.saver = tf.train.Saver(model.save_d_vars + model.save_g_vars, max_to_keep=200)
         print("Model saver", model.save_d_vars + model.save_g_vars)
         model.mobilenet_saver = tf.train.Saver(model.mobilenet_vars)
-        print("Model alexnet", model.mobilenet_vars)
-        model.age_saver = tf.train.Saver(model.age_vars)
-        print("Model age", model.age_vars)
+        # print("Model alexnet", model.mobilenet_vars)
+        # model.age_saver = tf.train.Saver(model.age_vars)
+        # print("Model age", model.age_vars)
 
         d_error = model.d_loss/model.gan_loss_weight
         g_error = model.g_loss/model.gan_loss_weight
@@ -125,7 +126,7 @@ def my_train():
         # print("age_lsgan before restore ",FLAGS.checkpoint_dir, model.saver )
         
         # print("alexnet_saver before restore ",FLAGS.alexnet_pretrained_model )
-        # model.alexnet_saver.restore(sess, FLAGS.alexnet_pretrained_model)
+        model.mobilenet_saver.restore(sess, FLAGS.mobilenet_pretrained_model)
         # print("age_saver before restore ",FLAGS.age_pretrained_model )
         # model.age_saver.restore(sess, FLAGS.age_pretrained_model)
         #FLAGS.checkpoint_dir, model.saver, 'acgan', 399999

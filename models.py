@@ -226,10 +226,11 @@ class FaceAging(object):
             # self.predictions = tf.nn.softmax(self.logits)
 
             if if_age:
-                # age_net = tf.nn.dropout(net, rate = 0.5)
-                # age_net = slim.fully_connected(age_net, 256, activation_fn=tf.nn.relu, scope='age_fc_16')
-                # age_net = tf.nn.dropout(age_net, rate = 0.2)
-                self.age_logits = self.fc(net, 5, "age_fc_16")
+                age_net = tf.nn.dropout(net, rate = 0.5, name='do_16')
+                age_net = self.fc(age_net, 256, "fc_17")
+                age_net = tf.nn.relu(age_net, name='relu_17')
+                age_net = tf.nn.dropout(age_net, rate = 0.2, name='do_18')
+                self.age_logits = self.fc(age_net, 5, "fc_19")
 
             return sc
 
@@ -510,9 +511,9 @@ class FaceAging(object):
 
         t_vars = tf.global_variables()
 
-        mobilenet_vars = [var for var in t_vars if 'mobilenet' in var.name]
-        self.mobilenet_vars = [var for var in mobilenet_vars if 'age' not in var.name]
-        self.age_vars = [var for var in t_vars if 'age' in var.name]
+        self.mobilenet_vars = [var for var in t_vars if 'mobilenet' in var.name]
+        # self.mobilenet_vars = [var for var in mobilenet_vars if 'age' not in var.name]
+        # self.age_vars = [var for var in t_vars if 'age' in var.name]
 
         self.save_d_vars = [var for var in t_vars if 'discriminator' in var.name]
         self.save_g_vars = [var for var in t_vars if 'generator' in var.name]
