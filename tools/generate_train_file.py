@@ -1,6 +1,6 @@
 import os
 
-path="/content/drive/My Drive/Diploma/dataset/CACD2000/"
+path="new_CACD/"
 agegrp_1=0
 agegrp_2=0
 agegrp_3=0
@@ -121,3 +121,19 @@ with open(path + '../test_age_group_4.txt', "a+") as f:
     for fname in test_age_4:
         f.write("%s\n" % fname)
 #
+
+d = {}
+for fname in os.listdir(path):
+    full_name = fname[2:]
+    d.setdefault(full_name)
+
+print(len(list(d.keys())))
+
+for i, v in enumerate(list(d.keys())):
+  d[v] = i
+
+f = open(path + 'face_train.txt',"a+")
+for fname in os.listdir(path):
+    label = d[fname]
+    f.write("%s %d\n"%(fname, label))
+       
