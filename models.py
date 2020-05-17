@@ -222,12 +222,14 @@ class FaceAging(object):
             self.conv_ds_14 = net
             net = self.avg_pool(net, 7, "avg_pool_15")
             net = tf.squeeze(net, [1, 2], name="SpatialSqueeze")
+            self.face_logits = self.fc(net, self.NUM_CLASSES, "fc_16")
 
-            net = tf.nn.dropout(net, rate = 0.5, name='do_16')
-            net = self.fc(net, 256, scope='fc_17')
-            net = tf.nn.relu(net, name='relu_17')
-            net = tf.nn.dropout(net, rate = 0.2, name='do_18')
-            self.age_logits = self.fc(net, 5, "fc_19")
+            if if_age:
+                age_net = tf.nn.dropout(net, rate = 0.5, name='do_16')
+                age_net = self.fc(age_net, 256, scope='fc_17')
+                age_net = tf.nn.relu(age_net, name='relu_17')
+                age_net = tf.nn.dropout(age_net, rate = 0.2, name='do_18')
+                self.age_logits = self.fc(age_net, 5, "fc_19")
 
             return sc
 
