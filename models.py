@@ -511,9 +511,9 @@ class FaceAging(object):
 
         t_vars = tf.global_variables()
 
-        self.mobilenet_vars = [var for var in t_vars if 'mobilenet' in var.name]
-        # self.mobilenet_vars = [var for var in mobilenet_vars if 'age' not in var.name]
-        # self.age_vars = [var for var in t_vars if 'age' in var.name]
+        mobilenet_vars = [var for var in t_vars if 'mobilenet' in var.name]
+        self.mobilenet_vars = [var for var in mobilenet_vars if 'do_16' not in var.name and "fc_17" not in var.name and 'relu_17' not in var.name and 'do_18' not in var.name and "fc_19" not in var.name]
+        self.age_vars = [var for var in mobilenet_vars if 'do_16' in var.name or "fc_17" in var.name or 'relu_17' in var.name or 'do_18' in var.name or "fc_19" in var.name]
 
         self.save_d_vars = [var for var in t_vars if 'discriminator' in var.name]
         self.save_g_vars = [var for var in t_vars if 'generator' in var.name]
