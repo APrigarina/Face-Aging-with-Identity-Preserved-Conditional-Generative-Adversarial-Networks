@@ -34,15 +34,15 @@ flags.DEFINE_float("age_loss_weight", None, "age_loss_weight")
 
 flags.DEFINE_float("tv_loss_weight", None, "face_loss_weight")
 
-flags.DEFINE_string("checkpoint_dir", '/content/drive/My Drive/Diploma/final_checkpoints/mobilenet',
+flags.DEFINE_string("checkpoint_dir", '/content/drive/My Drive/Diploma/final_checkpoints/alexnet',
                     "Directory name to save the checkpoints")
 
-flags.DEFINE_string("save_dir", '/content/drive/My Drive/Diploma/test_results/mobilenet',
+flags.DEFINE_string("save_dir", 'unknown_people_aging',
                     "Directory name to save the sample images")
 
-flags.DEFINE_string("test_data_dir", './images/test/', "test images")
+flags.DEFINE_string("test_data_dir", 'known_people/', "test images")
 
-flags.DEFINE_string("train_data_dir", './images/train/', "train images")
+flags.DEFINE_string("train_data_dir", 'unknown_people/', "train images")
 
 FLAGS = flags.FLAGS
 
@@ -70,7 +70,7 @@ def my_train():
 
         model.ge_samples = model.generate_images(model.imgs, model.true_label_features_128, stable_bn=False, mode='train')
 
-        model.get_vars_mobilenet()
+        model.get_vars()
 
         # Create a saver.
         model.saver = tf.train.Saver(model.save_g_vars)
@@ -78,7 +78,7 @@ def my_train():
         # Start running operations on the Graph.
         sess.run(tf.global_variables_initializer())
 
-        if model.load(FLAGS.checkpoint_dir, model.saver, 'mobilenet_acgan', 24999):
+        if model.load(FLAGS.checkpoint_dir, model.saver, 'acgan', 399999):
             print(" [*] Load SUCCESS")
         else:
             print(" [!] Load failed...")

@@ -14,9 +14,9 @@ class ImageDataGenerator:
                  scale_size=(64, 64), classes=5, mode='train'):
 
         # Init params
-        self.root_folder = '/content/drive/My Drive/Diploma/dataset/CACD2000/'
+        self.root_folder = 'new_CACD/'
         if mode == 'train':
-            self.file_folder = '/content/drive/My Drive/Diploma/dataset/'
+            self.file_folder = '/content/drive/My Drive/Diploma/dataset/new_markup/'
             self.class_lists = ['train_age_group_0.txt',
                                'train_age_group_1.txt',
                                'train_age_group_2.txt',
@@ -24,7 +24,7 @@ class ImageDataGenerator:
                                'train_age_group_4.txt']
             self.pointer = [0, 0, 0, 0, 0]
         else:
-            self.file_folder = '/content/drive/My Drive/Diploma/dataset/'
+            self.file_folder = '/content/drive/My Drive/Diploma/dataset/new_markup/'
             self.class_lists = ['test_age_group_0.txt',
                                'test_age_group_1.txt',
                                'test_age_group_2.txt',
