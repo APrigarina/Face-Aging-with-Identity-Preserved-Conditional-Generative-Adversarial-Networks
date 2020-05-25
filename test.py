@@ -40,9 +40,9 @@ flags.DEFINE_string("checkpoint_dir", '/content/drive/My Drive/Diploma/final_che
 flags.DEFINE_string("save_dir", 'unknown_people_aging',
                     "Directory name to save the sample images")
 
-flags.DEFINE_string("test_data_dir", 'known_people/', "test images")
+flags.DEFINE_string("test_data_dir", '../unknown_people/', "test images")
 
-flags.DEFINE_string("train_data_dir", 'unknown_people/', "train images")
+flags.DEFINE_string("train_data_dir", '../known_people/', "train images")
 
 FLAGS = flags.FLAGS
 
@@ -102,29 +102,32 @@ def generate_images_from_folder(model, sess, test_data_dir=None, train_data_dir=
     else:
         train_imgs, _ = generator.next_source_imgs(0, 128, batch_size=FLAGS.batch_size-1)
 
-    assert train_imgs.shape[0] == (FLAGS.batch_size-1)
+    # assert train_imgs.shape[0] == (FLAGS.batch_size-1)
 
-    for i in range(len(paths)):
-        print ("generate images from folder", i)
-        print (paths[i])
-        temp = np.reshape(source[i], (1, 128, 128, 3))
-        save_source(temp, [1, 1], os.path.join(FLAGS.save_dir, paths[i]))
-        images = np.concatenate((temp, train_imgs), axis=0)
-        time1 = time.time()
-        for j in range(1, generator.n_classes):
-            true_label_fea = generator.label_features_128[j]
-            dict = {
-                    model.imgs: images,
-                    model.true_label_features_128: true_label_fea,
-                    }
-            samples = sess.run(model.ge_samples, feed_dict=dict)
-            image = np.reshape(samples[0, :, :, :], (1, 128, 128, 3))
-            # generator.save_batch(samples, paths, FLAGS.save_dir, index=j, if_target=True)
-            save_images(image, [1, 1], os.path.join(FLAGS.save_dir, paths[i] + '_' + str(j) + '.jpg'))
+    step = 0
+    while step != 1643:
+        for i in range(len(paths):
+            batch_train_imgs = train_imgs[step:(step+32)]
+            print ("generate images from folder", i)
+            print (paths[i])
+            temp = np.reshape(source[i], (1, 128, 128, 3))
+            save_source(temp, [1, 1], os.path.join(FLAGS.save_dir, paths[i]))
+            images = np.concatenate((temp, batch_train_imgs), axis=0)
+            time1 = time.time()
+            for j in range(generator.n_classes):
+                true_label_fea = generator.label_features_128[j]
+                dict = {
+                        model.imgs: images,
+                        model.true_label_features_128: true_label_fea,
+                        }
+                samples = sess.run(model.ge_samples, feed_dict=dict)
+                image = np.reshape(samples[0, :, :, :], (1, 128, 128, 3))
+                # generator.save_batch(samples, paths, FLAGS.save_dir, index=j, if_target=True)
+                save_images(image, [1, 1], os.path.join(FLAGS.save_dir, paths[i] + '_' + str(j) + '.jpg'))
 
-        time2 = time.time() - time1
-        print ("time", time2)
-
+            time2 = time.time() - time1
+            print ("time", time2)
+        step += 32
 
 def generate_images(model, sess):
     source, paths = val_generator.next_source_imgs(0, 128, batch_size=FLAGS.batch_size)

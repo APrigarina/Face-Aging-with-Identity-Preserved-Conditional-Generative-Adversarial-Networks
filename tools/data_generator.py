@@ -14,7 +14,7 @@ class ImageDataGenerator:
                  scale_size=(64, 64), classes=5, mode='train'):
 
         # Init params
-        self.root_folder = 'new_CACD/'
+        self.root_folder = 'known_people/'
         if mode == 'train':
             self.file_folder = '/content/drive/My Drive/Diploma/dataset/new_markup/'
             self.class_lists = ['train_age_group_0.txt',
