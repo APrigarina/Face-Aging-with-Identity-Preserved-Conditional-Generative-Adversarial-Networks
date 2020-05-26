@@ -33,206 +33,206 @@ class FaceAging(object):
         self.tv_loss_weight = tv_loss_weight
         self.weight_decay_rate = 0.0005
 
-    def inference(self, x, scope_name='alexnet', reuse=False):
-        with tf.variable_scope(scope_name, reuse=reuse) as scope:
-            print("inference", x)
-            # 1st Layer: Conv (w ReLu) -> Pool -> Lrn
-            conv1 = conv(x, 11, 11, 96, 4, 4, padding='VALID', name='conv1')
-            pool1 = max_pool(conv1, 3, 3, 2, 2, padding='VALID', name='pool1')
-            norm1 = lrn(pool1, 2, 2e-05, 0.75, name='norm1')
+    # def inference(self, x, scope_name='alexnet', reuse=False):
+    #     with tf.variable_scope(scope_name, reuse=reuse) as scope:
+    #         print("inference", x)
+    #         # 1st Layer: Conv (w ReLu) -> Pool -> Lrn
+    #         conv1 = conv(x, 11, 11, 96, 4, 4, padding='VALID', name='conv1')
+    #         pool1 = max_pool(conv1, 3, 3, 2, 2, padding='VALID', name='pool1')
+    #         norm1 = lrn(pool1, 2, 2e-05, 0.75, name='norm1')
 
-            # 2nd Layer: Conv (w ReLu) -> Pool -> Lrn with 2 groups
-            conv2 = conv(norm1, 5, 5, 256, 1, 1, groups=2, name='conv2')
-            pool2 = max_pool(conv2, 3, 3, 2, 2, padding='VALID', name='pool2')
-            norm2 = lrn(pool2, 2, 2e-05, 0.75, name='norm2')
+    #         # 2nd Layer: Conv (w ReLu) -> Pool -> Lrn with 2 groups
+    #         conv2 = conv(norm1, 5, 5, 256, 1, 1, groups=2, name='conv2')
+    #         pool2 = max_pool(conv2, 3, 3, 2, 2, padding='VALID', name='pool2')
+    #         norm2 = lrn(pool2, 2, 2e-05, 0.75, name='norm2')
 
-            # 3rd Layer: Conv (w ReLu)
-            conv3 = conv(norm2, 3, 3, 384, 1, 1, name='conv3')
+    #         # 3rd Layer: Conv (w ReLu)
+    #         conv3 = conv(norm2, 3, 3, 384, 1, 1, name='conv3')
 
-            # 4th Layer: Conv (w ReLu) splitted into two groups
-            conv4 = conv(conv3, 3, 3, 384, 1, 1, groups=2, name='conv4')
+    #         # 4th Layer: Conv (w ReLu) splitted into two groups
+    #         conv4 = conv(conv3, 3, 3, 384, 1, 1, groups=2, name='conv4')
 
-            # 5th Layer: Conv (w ReLu) -> Pool splitted into two groups
-            conv5 = conv(conv4, 3, 3, 256, 1, 1, groups=2, name='conv5')
-            pool5 = max_pool(conv5, 3, 3, 2, 2, padding='VALID', name='pool5')
+    #         # 5th Layer: Conv (w ReLu) -> Pool splitted into two groups
+    #         conv5 = conv(conv4, 3, 3, 256, 1, 1, groups=2, name='conv5')
+    #         pool5 = max_pool(conv5, 3, 3, 2, 2, padding='VALID', name='pool5')
 
-            # 6th Layer: Flatten -> FC (w ReLu) -> Dropout
-            flattened = tf.reshape(pool5, [-1, 6 * 6 * 256])
-            fc6 = fc(flattened, 6 * 6 * 256, 4096, name='fc6')
-            dropout6 = dropout(fc6, self.KEEP_PROB)
+    #         # 6th Layer: Flatten -> FC (w ReLu) -> Dropout
+    #         flattened = tf.reshape(pool5, [-1, 6 * 6 * 256])
+    #         fc6 = fc(flattened, 6 * 6 * 256, 4096, name='fc6')
+    #         dropout6 = dropout(fc6, self.KEEP_PROB)
 
-            # 7th Layer: FC (w ReLu) -> Dropout
-            fc7 = fc(dropout6, 4096, 4096, name='fc7')
-            dropout7 = dropout(fc7, self.KEEP_PROB)
-            # 8th Layer: FC and return unscaled activations (for tf.nn.softmax_cross_entropy_with_logits)
-            self.fc8 = fc(dropout7, 4096, self.NUM_CLASSES, relu=False, name='fc8')
+    #         # 7th Layer: FC (w ReLu) -> Dropout
+    #         fc7 = fc(dropout6, 4096, 4096, name='fc7')
+    #         dropout7 = dropout(fc7, self.KEEP_PROB)
+    #         # 8th Layer: FC and return unscaled activations (for tf.nn.softmax_cross_entropy_with_logits)
+    #         self.fc8 = fc(dropout7, 4096, self.NUM_CLASSES, relu=False, name='fc8')
 
-            return scope
+    #         return scope
 
-    def face_age_alexnet(self, x, scope_name='alexnet', if_age=False, reuse=False):
-        with tf.variable_scope(scope_name, reuse=reuse) as scope:
-            print("face_age_alexnet", x)
-            # 1st Layer: Conv (w ReLu) -> Pool -> Lrn
-            conv1 = conv(x, 11, 11, 96, 4, 4, padding='VALID', name='conv1')
-            pool1 = max_pool(conv1, 3, 3, 2, 2, padding='VALID', name='pool1')
-            norm1 = lrn(pool1, 2, 2e-05, 0.75, name='norm1')
+    # def face_age_alexnet(self, x, scope_name='alexnet', if_age=False, reuse=False):
+    #     with tf.variable_scope(scope_name, reuse=reuse) as scope:
+    #         print("face_age_alexnet", x)
+    #         # 1st Layer: Conv (w ReLu) -> Pool -> Lrn
+    #         conv1 = conv(x, 11, 11, 96, 4, 4, padding='VALID', name='conv1')
+    #         pool1 = max_pool(conv1, 3, 3, 2, 2, padding='VALID', name='pool1')
+    #         norm1 = lrn(pool1, 2, 2e-05, 0.75, name='norm1')
 
-            # 2nd Layer: Conv (w ReLu) -> Pool -> Lrn with 2 groups
-            conv2 = conv(norm1, 5, 5, 256, 1, 1, groups=2, name='conv2')
-            pool2 = max_pool(conv2, 3, 3, 2, 2, padding='VALID', name='pool2')
-            norm2 = lrn(pool2, 2, 2e-05, 0.75, name='norm2')
+    #         # 2nd Layer: Conv (w ReLu) -> Pool -> Lrn with 2 groups
+    #         conv2 = conv(norm1, 5, 5, 256, 1, 1, groups=2, name='conv2')
+    #         pool2 = max_pool(conv2, 3, 3, 2, 2, padding='VALID', name='pool2')
+    #         norm2 = lrn(pool2, 2, 2e-05, 0.75, name='norm2')
 
-            # 3rd Layer: Conv (w ReLu)
-            conv3 = conv(norm2, 3, 3, 384, 1, 1, name='conv3')
-            self.conv3 = conv3
-            # 4th Layer: Conv (w ReLu) splitted into two groups
-            conv4 = conv(conv3, 3, 3, 384, 1, 1, groups=2, name='conv4')
-            self.conv4 = conv4
+    #         # 3rd Layer: Conv (w ReLu)
+    #         conv3 = conv(norm2, 3, 3, 384, 1, 1, name='conv3')
+    #         self.conv3 = conv3
+    #         # 4th Layer: Conv (w ReLu) splitted into two groups
+    #         conv4 = conv(conv3, 3, 3, 384, 1, 1, groups=2, name='conv4')
+    #         self.conv4 = conv4
 
-            # 5th Layer: Conv (w ReLu) -> Pool splitted into two groups
-            conv5 = conv(conv4, 3, 3, 256, 1, 1, groups=2, name='conv5')
-            self.conv5 = conv5
+    #         # 5th Layer: Conv (w ReLu) -> Pool splitted into two groups
+    #         conv5 = conv(conv4, 3, 3, 256, 1, 1, groups=2, name='conv5')
+    #         self.conv5 = conv5
 
-            pool5 = max_pool(conv5, 3, 3, 2, 2, padding='VALID', name='pool5')
-            self.pool5 = pool5
+    #         pool5 = max_pool(conv5, 3, 3, 2, 2, padding='VALID', name='pool5')
+    #         self.pool5 = pool5
 
-            # 6th Layer: Flatten -> FC (w ReLu) -> Dropout
-            flattened = tf.reshape(pool5, [-1, 6 * 6 * 256])
-            fc6 = fc(flattened, 6 * 6 * 256, 4096, name='fc6')
-            self.fc6 = fc6
-            dropout6 = dropout(fc6, self.KEEP_PROB)
+    #         # 6th Layer: Flatten -> FC (w ReLu) -> Dropout
+    #         flattened = tf.reshape(pool5, [-1, 6 * 6 * 256])
+    #         fc6 = fc(flattened, 6 * 6 * 256, 4096, name='fc6')
+    #         self.fc6 = fc6
+    #         dropout6 = dropout(fc6, self.KEEP_PROB)
 
-            # 7th Layer: FC (w ReLu) -> Dropout
-            fc7 = fc(dropout6, 4096, 4096, name='fc7')
-            self.fc7 = fc7
-            dropout7 = dropout(fc7, self.KEEP_PROB)
+    #         # 7th Layer: FC (w ReLu) -> Dropout
+    #         fc7 = fc(dropout6, 4096, 4096, name='fc7')
+    #         self.fc7 = fc7
+    #         dropout7 = dropout(fc7, self.KEEP_PROB)
 
-            face_fc9 = fc(dropout7, 4096, 256, name='new_1')
-            self.fc9 = face_fc9
-            # 8th Layer: FC and return unscaled activations (for tf.nn.softmax_cross_entropy_with_logits)
-            self.face_logits = fc(face_fc9, 256, self.NUM_CLASSES, relu=False, name='new_2')
-
-            if if_age:
-                age_fc6 = fc(flattened, 6 * 6 * 256, 4096, name='age_fc6')
-                age_dropout6 = dropout(age_fc6, self.KEEP_PROB)
-                # 7th Layer: FC (w ReLu) -> Dropout
-                age_fc7 = fc(age_dropout6, 4096, 4096, name='age_fc7')
-                age_dropout7 = dropout(age_fc7, self.KEEP_PROB)
-                self.age_logits = fc(age_dropout7, 4096, 5, name='age_fc8', relu=False)
-
-            return scope
-
-    # # create variable
-    # def create_variable(self, name, shape, initializer,
-    #     dtype=tf.float32, trainable=True):
-    #     return tf.get_variable(name, shape=shape, dtype=dtype, initializer=initializer, trainable=trainable)
-
-    # # batchnorm layer
-    # def bacthnorm(self, inputs, scope, epsilon=1e-05, momentum=0.99, is_training=True):
-    #     inputs_shape = inputs.get_shape().as_list()
-    #     params_shape = inputs_shape[-1:]
-    #     axis = list(range(len(inputs_shape) - 1))
-
-    #     with tf.variable_scope(scope):
-    #         beta = self.create_variable("beta", params_shape, initializer=tf.zeros_initializer())
-    #         gamma = self.create_variable("gamma", params_shape, initializer=tf.ones_initializer())
-    #         # for inference
-    #         moving_mean = self.create_variable("moving_mean", params_shape, initializer=tf.zeros_initializer(), trainable=False)
-    #         moving_variance = self.create_variable("moving_variance", params_shape, initializer=tf.ones_initializer(), trainable=False)
-    #     if is_training:
-    #         mean, variance = tf.nn.moments(inputs, axes=axis)
-    #         update_move_mean = moving_averages.assign_moving_average(moving_mean, mean, decay=momentum)
-    #         update_move_variance = moving_averages.assign_moving_average(moving_variance, variance, decay=momentum)
-    #         tf.add_to_collection(UPDATE_OPS_COLLECTION, update_move_mean)
-    #         tf.add_to_collection(UPDATE_OPS_COLLECTION, update_move_variance)
-    #     else:
-    #         mean, variance = moving_mean, moving_variance
-    #     return tf.nn.batch_normalization(inputs, mean, variance, beta, gamma, epsilon)
-
-    # # depthwise conv2d layer
-    # def depthwise_conv2d(self, inputs, scope, filter_size=3, channel_multiplier=1, strides=1):
-    #     inputs_shape = inputs.get_shape().as_list()
-    #     in_channels = inputs_shape[-1]
-    #     with tf.variable_scope(scope):
-    #         filter = self.create_variable("filter", shape=[filter_size, filter_size, in_channels, channel_multiplier], initializer=tf.truncated_normal_initializer(stddev=0.01))
-
-    #     return tf.nn.depthwise_conv2d(inputs, filter, strides=[1, strides, strides, 1], padding="SAME", rate=[1, 1])
-
-    # # conv2d layer
-    # def conv2d(self, inputs, scope, num_filters, filter_size=1, strides=1):
-    #     inputs_shape = inputs.get_shape().as_list()
-    #     in_channels = inputs_shape[-1]
-    #     with tf.variable_scope(scope):
-    #         filter = self.create_variable("filter", shape=[filter_size, filter_size, in_channels, num_filters], initializer=tf.truncated_normal_initializer(stddev=0.01))
-    #     return tf.nn.conv2d(inputs, filter, strides=[1, strides, strides, 1], padding="SAME")
-
-    # # avg pool layer
-    # def avg_pool(self, inputs, pool_size, scope):
-    #     with tf.variable_scope(scope):
-    #         return tf.nn.avg_pool(inputs, [1, pool_size, pool_size, 1], strides=[1, pool_size, pool_size, 1], padding="VALID")
-
-    # # fully connected layer
-    # def fc(self, inputs, n_out, scope, use_bias=True):
-    #     inputs_shape = inputs.get_shape().as_list()
-    #     n_in = inputs_shape[-1]
-    #     with tf.variable_scope(scope):
-    #         weight = self.create_variable("weight", shape=[n_in, n_out], initializer=tf.random_normal_initializer(stddev=0.01))
-    #         if use_bias:
-    #             bias = self.create_variable("bias", shape=[n_out,], initializer=tf.zeros_initializer())
-    #             return tf.nn.xw_plus_b(inputs, weight, bias)
-    #         return tf.matmul(inputs, weight)
-        
-    # def _depthwise_separable_conv2d(self, inputs, num_filters, width_multiplier, scope, downsample=False, is_training=False):
-    #     """depthwise separable convolution 2D function"""
-    #     num_filters = round(num_filters * width_multiplier)
-    #     strides = 2 if downsample else 1
-
-    #     with tf.variable_scope(scope):
-    #         # depthwise conv2d
-    #         dw_conv = self.depthwise_conv2d(inputs, "depthwise_conv", strides=strides)
-    #         # batchnorm
-    #         bn = self.bacthnorm(dw_conv, "dw_bn", is_training=is_training)
-    #         # relu
-    #         relu = tf.nn.relu(bn)
-    #         # pointwise conv2d (1x1)
-    #         pw_conv = self.conv2d(relu, "pointwise_conv", num_filters)
-    #         # bn
-    #         bn = self.bacthnorm(pw_conv, "pw_bn", is_training=is_training)
-    #         return tf.nn.relu(bn)
-
-
-    # def face_age_mobilenet(self, x, scope_name='mobilenet', if_age=False, reuse=False, width_multiplier=1, is_training=False):
-    #     with tf.variable_scope(scope_name, reuse=reuse) as sc:
-    #         # conv1
-    #         net = self.conv2d(x, "conv_1", round(32 * width_multiplier), filter_size=3, strides=2)  # ->[N, 112, 112, 32]
-    #         net = tf.nn.relu(self.bacthnorm(net, "conv_1/bn", is_training=is_training))
-    #         net = self._depthwise_separable_conv2d(net, 64, width_multiplier, "ds_conv_2", is_training=is_training) # ->[N, 112, 112, 64]
-    #         net = self._depthwise_separable_conv2d(net, 128, width_multiplier, "ds_conv_3", downsample=True, is_training=is_training) # ->[N, 56, 56, 128]
-    #         net = self._depthwise_separable_conv2d(net, 128, width_multiplier, "ds_conv_4", is_training=is_training) # ->[N, 56, 56, 128]
-    #         net = self._depthwise_separable_conv2d(net, 256, width_multiplier, "ds_conv_5", downsample=True, is_training=is_training) # ->[N, 28, 28, 256]
-    #         net = self._depthwise_separable_conv2d(net, 256, width_multiplier, "ds_conv_6", is_training=is_training) # ->[N, 28, 28, 256]
-    #         net = self._depthwise_separable_conv2d(net, 512, width_multiplier, "ds_conv_7", downsample=True, is_training=is_training) # ->[N, 14, 14, 512]
-    #         net = self._depthwise_separable_conv2d(net, 512, width_multiplier, "ds_conv_8", is_training=is_training) # ->[N, 14, 14, 512]
-    #         net = self._depthwise_separable_conv2d(net, 512, width_multiplier, "ds_conv_9", is_training=is_training)  # ->[N, 14, 14, 512]
-    #         net = self._depthwise_separable_conv2d(net, 512, width_multiplier, "ds_conv_10", is_training=is_training)  # ->[N, 14, 14, 512]
-    #         net = self._depthwise_separable_conv2d(net, 512, width_multiplier, "ds_conv_11", is_training=is_training)  # ->[N, 14, 14, 512]
-    #         net = self._depthwise_separable_conv2d(net, 512, width_multiplier, "ds_conv_12", is_training=is_training)  # ->[N, 14, 14, 512]
-    #         net = self._depthwise_separable_conv2d(net, 1024, width_multiplier, "ds_conv_13", downsample=True, is_training=is_training) # ->[N, 7, 7, 1024]
-    #         net = self._depthwise_separable_conv2d(net, 1024, width_multiplier, "ds_conv_14", is_training=is_training) # ->[N, 7, 7, 1024]
-    #         self.conv_ds_14 = net
-    #         net = self.avg_pool(net, 7, "avg_pool_15")
-    #         net = tf.squeeze(net, [1, 2], name="SpatialSqueeze")
-    #         self.face_logits = self.fc(net, self.NUM_CLASSES, "fc_16")
-    #         # self.predictions = tf.nn.softmax(self.logits)
+    #         face_fc9 = fc(dropout7, 4096, 256, name='new_1')
+    #         self.fc9 = face_fc9
+    #         # 8th Layer: FC and return unscaled activations (for tf.nn.softmax_cross_entropy_with_logits)
+    #         self.face_logits = fc(face_fc9, 256, self.NUM_CLASSES, relu=False, name='new_2')
 
     #         if if_age:
-    #             age_net = tf.nn.dropout(net, rate = 0.5, name='do_16')
-    #             age_net = self.fc(age_net, 256, "fc_17")
-    #             age_net = tf.nn.relu(age_net, name='relu_17')
-    #             age_net = tf.nn.dropout(age_net, rate = 0.2, name='do_18')
-    #             self.age_logits = self.fc(age_net, 5, "fc_19")
+    #             age_fc6 = fc(flattened, 6 * 6 * 256, 4096, name='age_fc6')
+    #             age_dropout6 = dropout(age_fc6, self.KEEP_PROB)
+    #             # 7th Layer: FC (w ReLu) -> Dropout
+    #             age_fc7 = fc(age_dropout6, 4096, 4096, name='age_fc7')
+    #             age_dropout7 = dropout(age_fc7, self.KEEP_PROB)
+    #             self.age_logits = fc(age_dropout7, 4096, 5, name='age_fc8', relu=False)
 
-    #         return sc
+    #         return scope
+
+    # create variable
+    def create_variable(self, name, shape, initializer,
+        dtype=tf.float32, trainable=True):
+        return tf.get_variable(name, shape=shape, dtype=dtype, initializer=initializer, trainable=trainable)
+
+    # batchnorm layer
+    def bacthnorm(self, inputs, scope, epsilon=1e-05, momentum=0.99, is_training=True):
+        inputs_shape = inputs.get_shape().as_list()
+        params_shape = inputs_shape[-1:]
+        axis = list(range(len(inputs_shape) - 1))
+
+        with tf.variable_scope(scope):
+            beta = self.create_variable("beta", params_shape, initializer=tf.zeros_initializer())
+            gamma = self.create_variable("gamma", params_shape, initializer=tf.ones_initializer())
+            # for inference
+            moving_mean = self.create_variable("moving_mean", params_shape, initializer=tf.zeros_initializer(), trainable=False)
+            moving_variance = self.create_variable("moving_variance", params_shape, initializer=tf.ones_initializer(), trainable=False)
+        if is_training:
+            mean, variance = tf.nn.moments(inputs, axes=axis)
+            update_move_mean = moving_averages.assign_moving_average(moving_mean, mean, decay=momentum)
+            update_move_variance = moving_averages.assign_moving_average(moving_variance, variance, decay=momentum)
+            tf.add_to_collection(UPDATE_OPS_COLLECTION, update_move_mean)
+            tf.add_to_collection(UPDATE_OPS_COLLECTION, update_move_variance)
+        else:
+            mean, variance = moving_mean, moving_variance
+        return tf.nn.batch_normalization(inputs, mean, variance, beta, gamma, epsilon)
+
+    # depthwise conv2d layer
+    def depthwise_conv2d(self, inputs, scope, filter_size=3, channel_multiplier=1, strides=1):
+        inputs_shape = inputs.get_shape().as_list()
+        in_channels = inputs_shape[-1]
+        with tf.variable_scope(scope):
+            filter = self.create_variable("filter", shape=[filter_size, filter_size, in_channels, channel_multiplier], initializer=tf.truncated_normal_initializer(stddev=0.01))
+
+        return tf.nn.depthwise_conv2d(inputs, filter, strides=[1, strides, strides, 1], padding="SAME", rate=[1, 1])
+
+    # conv2d layer
+    def conv2d(self, inputs, scope, num_filters, filter_size=1, strides=1):
+        inputs_shape = inputs.get_shape().as_list()
+        in_channels = inputs_shape[-1]
+        with tf.variable_scope(scope):
+            filter = self.create_variable("filter", shape=[filter_size, filter_size, in_channels, num_filters], initializer=tf.truncated_normal_initializer(stddev=0.01))
+        return tf.nn.conv2d(inputs, filter, strides=[1, strides, strides, 1], padding="SAME")
+
+    # avg pool layer
+    def avg_pool(self, inputs, pool_size, scope):
+        with tf.variable_scope(scope):
+            return tf.nn.avg_pool(inputs, [1, pool_size, pool_size, 1], strides=[1, pool_size, pool_size, 1], padding="VALID")
+
+    # fully connected layer
+    def fc(self, inputs, n_out, scope, use_bias=True):
+        inputs_shape = inputs.get_shape().as_list()
+        n_in = inputs_shape[-1]
+        with tf.variable_scope(scope):
+            weight = self.create_variable("weight", shape=[n_in, n_out], initializer=tf.random_normal_initializer(stddev=0.01))
+            if use_bias:
+                bias = self.create_variable("bias", shape=[n_out,], initializer=tf.zeros_initializer())
+                return tf.nn.xw_plus_b(inputs, weight, bias)
+            return tf.matmul(inputs, weight)
+        
+    def _depthwise_separable_conv2d(self, inputs, num_filters, width_multiplier, scope, downsample=False, is_training=False):
+        """depthwise separable convolution 2D function"""
+        num_filters = round(num_filters * width_multiplier)
+        strides = 2 if downsample else 1
+
+        with tf.variable_scope(scope):
+            # depthwise conv2d
+            dw_conv = self.depthwise_conv2d(inputs, "depthwise_conv", strides=strides)
+            # batchnorm
+            bn = self.bacthnorm(dw_conv, "dw_bn", is_training=is_training)
+            # relu
+            relu = tf.nn.relu(bn)
+            # pointwise conv2d (1x1)
+            pw_conv = self.conv2d(relu, "pointwise_conv", num_filters)
+            # bn
+            bn = self.bacthnorm(pw_conv, "pw_bn", is_training=is_training)
+            return tf.nn.relu(bn)
+
+
+    def face_age_mobilenet(self, x, scope_name='mobilenet', if_age=False, reuse=False, width_multiplier=1, is_training=False):
+        with tf.variable_scope(scope_name, reuse=reuse) as sc:
+            # conv1
+            net = self.conv2d(x, "conv_1", round(32 * width_multiplier), filter_size=3, strides=2)  # ->[N, 112, 112, 32]
+            net = tf.nn.relu(self.bacthnorm(net, "conv_1/bn", is_training=is_training))
+            net = self._depthwise_separable_conv2d(net, 64, width_multiplier, "ds_conv_2", is_training=is_training) # ->[N, 112, 112, 64]
+            net = self._depthwise_separable_conv2d(net, 128, width_multiplier, "ds_conv_3", downsample=True, is_training=is_training) # ->[N, 56, 56, 128]
+            net = self._depthwise_separable_conv2d(net, 128, width_multiplier, "ds_conv_4", is_training=is_training) # ->[N, 56, 56, 128]
+            net = self._depthwise_separable_conv2d(net, 256, width_multiplier, "ds_conv_5", downsample=True, is_training=is_training) # ->[N, 28, 28, 256]
+            net = self._depthwise_separable_conv2d(net, 256, width_multiplier, "ds_conv_6", is_training=is_training) # ->[N, 28, 28, 256]
+            net = self._depthwise_separable_conv2d(net, 512, width_multiplier, "ds_conv_7", downsample=True, is_training=is_training) # ->[N, 14, 14, 512]
+            net = self._depthwise_separable_conv2d(net, 512, width_multiplier, "ds_conv_8", is_training=is_training) # ->[N, 14, 14, 512]
+            net = self._depthwise_separable_conv2d(net, 512, width_multiplier, "ds_conv_9", is_training=is_training)  # ->[N, 14, 14, 512]
+            net = self._depthwise_separable_conv2d(net, 512, width_multiplier, "ds_conv_10", is_training=is_training)  # ->[N, 14, 14, 512]
+            net = self._depthwise_separable_conv2d(net, 512, width_multiplier, "ds_conv_11", is_training=is_training)  # ->[N, 14, 14, 512]
+            net = self._depthwise_separable_conv2d(net, 512, width_multiplier, "ds_conv_12", is_training=is_training)  # ->[N, 14, 14, 512]
+            net = self._depthwise_separable_conv2d(net, 1024, width_multiplier, "ds_conv_13", downsample=True, is_training=is_training) # ->[N, 7, 7, 1024]
+            net = self._depthwise_separable_conv2d(net, 1024, width_multiplier, "ds_conv_14", is_training=is_training) # ->[N, 7, 7, 1024]
+            self.conv_ds_14 = net
+            net = self.avg_pool(net, 7, "avg_pool_15")
+            net = tf.squeeze(net, [1, 2], name="SpatialSqueeze")
+            self.face_logits = self.fc(net, self.NUM_CLASSES, "fc_16")
+            # self.predictions = tf.nn.softmax(self.logits)
+
+            if if_age:
+                age_net = tf.nn.dropout(net, rate = 0.5, name='do_16')
+                age_net = self.fc(age_net, 256, "fc_17")
+                age_net = tf.nn.relu(age_net, name='relu_17')
+                age_net = tf.nn.dropout(age_net, rate = 0.2, name='do_18')
+                self.age_logits = self.fc(age_net, 5, "fc_19")
+
+            return sc
 
     def ResnetGenerator(self, image, name, n_blocks=6, condition=None, mode='train', reuse=False):
         with tf.variable_scope(name):
@@ -302,7 +302,7 @@ class FaceAging(object):
         :return:
         """
         print("imgs", imgs)
-        self.face_age_alexnet(source_img_227, if_age=True)
+        self.face_age_mobilenet(source_img_227, if_age=True)
         if fea_layer_name == 'ds_conv':
             source_fea = self.ds_conv 
         if fea_layer_name == 'conv_ds_12':
@@ -354,7 +354,7 @@ class FaceAging(object):
         g_source = g_source - self.mean
         print("Okay 4")
 
-        self.face_age_alexnet(g_source, if_age=True, reuse=True)
+        self.face_age_mobilenet(g_source, if_age=True, reuse=True)
         print("Okay 5")
         self.age_loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
                                                 logits=self.age_logits, labels=age_label)) * self.age_loss_weight
@@ -386,7 +386,7 @@ class FaceAging(object):
         g_loss = self.g_loss + self.fea_loss + self.age_loss
         print("Okay 7")
 
-        self.get_vars()
+        self.get_vars_mobilenet()
         print("Okay 8")
 
         d_optim = tf.train.AdamOptimizer(self.learning_rate, beta1=0.5).minimize(self.d_loss,

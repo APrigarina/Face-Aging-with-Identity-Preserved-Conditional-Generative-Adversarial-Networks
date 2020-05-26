@@ -34,10 +34,10 @@ flags.DEFINE_float("age_loss_weight", None, "age_loss_weight")
 
 flags.DEFINE_float("tv_loss_weight", None, "face_loss_weight")
 
-flags.DEFINE_string("checkpoint_dir", '/content/drive/My Drive/Diploma/final_checkpoints/alexnet',
+flags.DEFINE_string("checkpoint_dir", '/content/drive/My Drive/Diploma/final_checkpoints/mobilenet',
                     "Directory name to save the checkpoints")
 
-flags.DEFINE_string("save_dir", 'unknown_people_aging',
+flags.DEFINE_string("save_dir", '/content/drive/My Drive/Diploma/unknown_people_aging_mobilenet',
                     "Directory name to save the sample images")
 
 flags.DEFINE_string("test_data_dir", '../unknown_people/', "test images")
@@ -70,7 +70,7 @@ def my_train():
 
         model.ge_samples = model.generate_images(model.imgs, model.true_label_features_128, stable_bn=False, mode='train')
 
-        model.get_vars()
+        model.get_vars_mobilenet()
 
         # Create a saver.
         model.saver = tf.train.Saver(model.save_g_vars)
@@ -78,7 +78,7 @@ def my_train():
         # Start running operations on the Graph.
         sess.run(tf.global_variables_initializer())
 
-        if model.load(FLAGS.checkpoint_dir, model.saver, 'acgan', 399999):
+        if model.load(FLAGS.checkpoint_dir, model.saver, 'mobilenet_acgan', 24999):
             print(" [*] Load SUCCESS")
         else:
             print(" [!] Load failed...")
@@ -105,29 +105,27 @@ def generate_images_from_folder(model, sess, test_data_dir=None, train_data_dir=
     # assert train_imgs.shape[0] == (FLAGS.batch_size-1)
 
     step = 0
-    while step != 1643:
-        for i in range(len(paths):
-            batch_train_imgs = train_imgs[step:(step+32)]
-            print ("generate images from folder", i)
-            print (paths[i])
-            temp = np.reshape(source[i], (1, 128, 128, 3))
-            save_source(temp, [1, 1], os.path.join(FLAGS.save_dir, paths[i]))
-            images = np.concatenate((temp, batch_train_imgs), axis=0)
-            time1 = time.time()
-            for j in range(generator.n_classes):
-                true_label_fea = generator.label_features_128[j]
-                dict = {
-                        model.imgs: images,
-                        model.true_label_features_128: true_label_fea,
-                        }
-                samples = sess.run(model.ge_samples, feed_dict=dict)
-                image = np.reshape(samples[0, :, :, :], (1, 128, 128, 3))
-                # generator.save_batch(samples, paths, FLAGS.save_dir, index=j, if_target=True)
-                save_images(image, [1, 1], os.path.join(FLAGS.save_dir, paths[i] + '_' + str(j) + '.jpg'))
+    for i in range(len(paths):
+        batch_train_imgs = train_imgs[step:(step+32)]
+        print ("generate images from folder", i)
+        print (paths[i])
+        temp = np.reshape(source[i], (1, 128, 128, 3))
+        save_source(temp, [1, 1], os.path.join(FLAGS.save_dir, paths[i]))
+        images = np.concatenate((temp, batch_train_imgs), axis=0)
+        time1 = time.time()
+        for j in range(generator.n_classes):
+            true_label_fea = generator.label_features_128[j]
+            dict = {
+                    model.imgs: images,
+                    model.true_label_features_128: true_label_fea,
+                    }
+            samples = sess.run(model.ge_samples, feed_dict=dict)
+            image = np.reshape(samples[0, :, :, :], (1, 128, 128, 3))
+            # generator.save_batch(samples, paths, FLAGS.save_dir, index=j, if_target=True)
+            save_images(image, [1, 1], os.path.join(FLAGS.save_dir, paths[i] + '_' + str(j) + '.jpg'))
 
-            time2 = time.time() - time1
-            print ("time", time2)
-        step += 32
+        time2 = time.time() - time1
+        print ("time", time2)
 
 def generate_images(model, sess):
     source, paths = val_generator.next_source_imgs(0, 128, batch_size=FLAGS.batch_size)
